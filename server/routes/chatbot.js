@@ -1,5 +1,7 @@
 import express from 'express';
 
+import https from 'https';
+
 const router = express.Router();
 
 router.post('/ask', async (req, res) => {
@@ -22,29 +24,66 @@ router.post('/ask', async (req, res) => {
       parts: [{ text: message }]
     });
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+    const postData = JSON.stringify({
+      contents,
+      systemInstruction: {
+        parts: [{ text: "You are a helpful DBMS (Database Management Systems) tutor for students. Answer questions clearly but VERY concisely. Keep responses extremely brief and focused." }]
       },
-      body: JSON.stringify({
-        contents,
-        systemInstruction: {
-          parts: [{ text: "You are a helpful DBMS (Database Management Systems) tutor for students. Answer questions clearly, providing examples when appropriate. Keep responses concise and focused on database concepts." }]
-        }
-      })
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 250
+      }
     });
 
-    const data = await response.json();
-    
-    if (!response.ok) {
-      console.error("Gemini API Error:", data);
-      return res.status(500).json({ error: data.error?.message || 'Failed to get response from Gemini API' });
-    }
+    // Use gemini-1.5-flash-8b for maximum speed and https to avoid Node fetch hangs
+    const options = {
+      hostname: 'generativelanguage.googleapis.com',
+      port: 443,
+      path: \`/v1beta/models/gemini-1.5-flash-8b:generateContent?key=\${apiKey}\`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      },
+      timeout: 10000 // 10 seconds timeout
+    };
 
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I couldn't generate a response.";
-    
-    res.json({ reply });
+    const reqPost = https.request(options, (resPost) => {
+      let dataChunks = '';
+
+      resPost.on('data', (chunk) => {
+        dataChunks += chunk;
+      });
+
+      resPost.on('end', () => {
+        try {
+          const data = JSON.parse(dataChunks);
+          if (resPost.statusCode !== 200) {
+            console.error("Gemini API Error:", data);
+            return res.status(500).json({ error: data.error?.message || 'Failed to get response from Gemini API' });
+          }
+
+          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I couldn't generate a response.";
+          res.json({ reply });
+        } catch (e) {
+          res.status(500).json({ error: 'Invalid JSON response from AI provider' });
+        }
+      });
+    });
+
+    reqPost.on('error', (e) => {
+      console.error("Chatbot Request Error:", e);
+      res.status(500).json({ error: 'Failed to communicate with AI endpoint' });
+    });
+
+    reqPost.on('timeout', () => {
+      reqPost.destroy();
+      res.status(504).json({ error: 'AI generation request timed out' });
+    });
+
+    reqPost.write(postData);
+    reqPost.end();
+
   } catch (err) {
     console.error("Chatbot Error:", err);
     res.status(500).json({ error: 'Internal server error while processing request' });
