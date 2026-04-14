@@ -8,7 +8,7 @@ const maskKey = (key) => key ? `${key.slice(0, 4)}...${key.slice(-4)}` : 'MISSIN
 
 // Health check / Status endpoint
 router.get('/status', (req, res) => {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyCjMYlTMnXQsmsVGEDR1z7u_zpyUc5OV-Y";
   res.json({
     status: 'ok',
     apiKeyConfigured: !!apiKey,
@@ -31,7 +31,7 @@ router.post('/ask', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || "AIzaSyCjMYlTMnXQsmsVGEDR1z7u_zpyUc5OV-Y";
     if (!apiKey) {
       console.error(`[Chatbot:${requestId}] API Key missing`);
       return res.status(500).json({ error: 'Gemini API key not configured on server' });
