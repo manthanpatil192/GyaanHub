@@ -13,7 +13,7 @@ router.get('/status', (req, res) => {
     mode: 'Cloud AI (Groq)',
     apiKeyConfigured: !!apiKey,
     apiKeyPreview: maskKey(apiKey),
-    engine: 'llama3-8b-8192 via Groq'
+    engine: 'llama-3.1-8b-instant via Groq'
   });
 });
 
@@ -40,7 +40,7 @@ router.post('/ask', async (req, res) => {
     messages.push({ role: 'user', content: message });
 
     const postData = JSON.stringify({
-      model: "llama3-8b-8192",
+      model: "llama-3.1-8b-instant",
       messages: messages,
       temperature: 0.7,
       max_tokens: 500
