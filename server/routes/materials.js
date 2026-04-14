@@ -37,7 +37,8 @@ router.get('/', authenticate, async (req, res) => {
       .select(`
         *,
         users (full_name),
-        modules (title)
+        modules (title),
+        purchases (user_id)
       `)
       .order('created_at', { ascending: false });
 
@@ -46,7 +47,8 @@ router.get('/', authenticate, async (req, res) => {
     const materialsList = materials.map(m => ({
       ...m,
       creator_name: m.users?.full_name || 'Unknown',
-      module_title: m.modules?.title || null
+      module_title: m.modules?.title || null,
+      is_purchased: m.purchases?.some(p => p.user_id === req.user.id) || m.price <= 0
     }));
 
     res.json(materialsList);
@@ -120,7 +122,7 @@ router.post('/upload', authenticate, requireRole('teacher'), upload.single('file
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const { title, description, module_id } = req.body;
+    const { title, description, module_id, type, price } = req.body;
 
     // Ensure bucket exists (ignores error if it already does)
     await supabase.storage.createBucket('materials', { public: true });
@@ -151,7 +153,8 @@ router.post('/upload', authenticate, requireRole('teacher'), upload.single('file
       .insert([{
         title: title || req.file.originalname,
         description: description || `Uploaded file: ${req.file.originalname}`,
-        type: 'pdf',
+        type: type || 'pdf',
+        price: parseFloat(price) || 0,
         url: publicUrl,
         module_id: module_id || null,
         created_by: req.user.id
@@ -163,6 +166,40 @@ router.post('/upload', authenticate, requireRole('teacher'), upload.single('file
     res.status(201).json(material);
   } catch (err) {
     console.error('Upload material error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Record a purchase (Simulated UPI)
+router.post('/purchase', authenticate, async (req, res) => {
+  try {
+    const { material_id, amount } = req.body;
+
+    if (!material_id) {
+      return res.status(400).json({ error: 'Material ID is required' });
+    }
+
+    const { data, error } = await supabase
+      .from('purchases')
+      .insert([{
+        user_id: req.user.id,
+        material_id,
+        amount: amount || 2,
+        status: 'completed'
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505') { // Unique constraint
+        return res.status(400).json({ error: 'Material already purchased' });
+      }
+      throw error;
+    }
+
+    res.status(201).json(data);
+  } catch (err) {
+    console.error('Purchase error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

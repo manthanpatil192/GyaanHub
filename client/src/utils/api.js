@@ -124,7 +124,11 @@ export const materials = {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Upload failed');
     return data;
-  }
+  },
+  purchase: (materialId, amount = 2) => request('/materials/purchase', {
+    method: 'POST',
+    body: JSON.stringify({ material_id: materialId, amount })
+  })
 };
 
 // Chatbot

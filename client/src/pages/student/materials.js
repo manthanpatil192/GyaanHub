@@ -10,33 +10,36 @@ export async function renderStudyMaterials() {
     const videos = allMaterials.filter(m => m.type === 'video');
     const ppts = allMaterials.filter(m => m.type === 'ppt');
     const pdfs = allMaterials.filter(m => m.type === 'pdf');
+    const pqqs = allMaterials.filter(m => m.type === 'pqqs');
 
     let activeTab = 'videos';
     let expandedVideo = null;
     let activePPT = null;
     let activeSlideIndex = 0;
+    let payingForMaterial = null;
+
 
     function render() {
       const content = `
         <div class="page-header">
           <div>
             <h1 class="page-title">Study Materials 📖</h1>
-            <p class="page-subtitle">Video lectures, presentations, and reference notes</p>
+            <p class="page-subtitle">Video lectures, presentations, and PQQ papers</p>
           </div>
         </div>
 
         <!-- Stats bar -->
-        <div class="stats-grid" style="margin-bottom:var(--space-xl);grid-template-columns:repeat(4,1fr);">
+        <div class="stats-grid" style="margin-bottom:var(--space-xl);grid-template-columns:repeat(5,1fr);">
           <div class="stat-card blue">
             <div class="stat-card-header">
-              <span class="stat-card-label">Video Lectures</span>
+              <span class="stat-card-label">Videos</span>
               <div class="stat-card-icon">🎥</div>
             </div>
             <div class="stat-card-value">${videos.length}</div>
           </div>
           <div class="stat-card purple">
             <div class="stat-card-header">
-              <span class="stat-card-label">Presentations</span>
+              <span class="stat-card-label">PPTs</span>
               <div class="stat-card-icon">📑</div>
             </div>
             <div class="stat-card-value">${ppts.length}</div>
@@ -50,7 +53,14 @@ export async function renderStudyMaterials() {
           </div>
           <div class="stat-card amber">
             <div class="stat-card-header">
-              <span class="stat-card-label">Overall</span>
+              <span class="stat-card-label">PQQ Papers</span>
+              <div class="stat-card-icon">💰</div>
+            </div>
+            <div class="stat-card-value">${pqqs.length}</div>
+          </div>
+          <div class="stat-card indigo">
+            <div class="stat-card-header">
+              <span class="stat-card-label">Total</span>
               <div class="stat-card-icon">📚</div>
             </div>
             <div class="stat-card-value">${allMaterials.length}</div>
@@ -62,6 +72,7 @@ export async function renderStudyMaterials() {
           <button class="tab-btn ${activeTab === 'videos' ? 'tab-active' : ''}" data-tab="videos">🎥 Videos</button>
           <button class="tab-btn ${activeTab === 'ppts' ? 'tab-active' : ''}" data-tab="ppts">📑 Presentations</button>
           <button class="tab-btn ${activeTab === 'pdfs' ? 'tab-active' : ''}" data-tab="pdfs">📕 PDF Notes</button>
+          <button class="tab-btn ${activeTab === 'pqqs' ? 'tab-active' : ''}" data-tab="pqqs">💰 PQQ Papers</button>
           <button class="tab-btn ${activeTab === 'all' ? 'tab-active' : ''}" data-tab="all">📋 All</button>
         </div>
 
@@ -70,8 +81,10 @@ export async function renderStudyMaterials() {
           ${activeTab === 'videos' ? renderVideoSection(videos) : ''}
           ${activeTab === 'ppts' ? renderPPTSection(ppts) : ''}
           ${activeTab === 'pdfs' ? renderPDFSection(pdfs) : ''}
+          ${activeTab === 'pqqs' ? renderPQQSection(pqqs) : ''}
           ${activeTab === 'all' ? renderAllSection(allMaterials) : ''}
         </div>
+        ${payingForMaterial ? renderPaymentModal(payingForMaterial) : ''}
       `;
 
       const main = document.querySelector('.layout-content');
@@ -84,7 +97,82 @@ export async function renderStudyMaterials() {
       bindEvents();
     }
 
+    // ============ PQQ SECTION ============
+    function renderPQQSection(pqqList) {
+      if (pqqList.length === 0) {
+        return '<div class="card-flat"><div class="empty-state"><div class="empty-state-icon">💰</div><p class="empty-state-title">No PQQ papers available yet</p></div></div>';
+      }
+
+      return `
+        <div class="grid-auto" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));">
+          ${pqqList.map(p => {
+            const isPurchased = p.is_purchased;
+            return `
+              <div class="card-flat" style="display:flex;flex-direction:column;justify-content:space-between;padding:0;overflow:hidden;border:1px solid ${isPurchased ? 'var(--accent-emerald)' : 'var(--accent-amber)'}30;">
+                <div style="padding:var(--space-lg);">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-md);">
+                    <div style="width:48px;height:48px;border-radius:12px;background:${isPurchased ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)'};display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                      ${isPurchased ? '🔓' : '🔒'}
+                    </div>
+                    <span class="badge badge-${isPurchased ? 'emerald' : 'amber'}">${isPurchased ? 'UNLOCKED' : 'LOCKED'}</span>
+                  </div>
+                  <h3 style="font-size:1.1rem;margin-bottom:4px;font-weight:700;">${p.title}</h3>
+                  <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:var(--space-md);line-height:1.5;">${p.description}</p>
+                  <div style="display:flex;gap:6px;align-items:center;">
+                    ${p.module_title ? `<span class="badge badge-blue">${p.module_title}</span>` : ''}
+                    <span class="badge badge-ghost">₹${p.price}</span>
+                  </div>
+                </div>
+                <div style="background:var(--bg-secondary);padding:var(--space-md);display:flex;gap:var(--space-sm);">
+                  ${isPurchased 
+                    ? `<a href="${p.url}" target="_blank" class="btn btn-primary btn-sm" style="flex:1;">View Paper ↗</a>`
+                    : `<button class="btn btn-primary btn-sm buy-btn" data-id="${p.id}" style="flex:1;background:var(--accent-amber);border-color:var(--accent-amber);">Unlock for ₹${p.price} 💰</button>`
+                  }
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderPaymentModal(material) {
+      // Use the user's UPI ID: manthanpatil192@okicici
+      const upiId = 'manthanpatil192@okicici';
+      const payeeName = 'Manthan Patil';
+      const amount = '2';
+      const transactionNote = `Unlock_${material.title.replace(/\s+/g, '_')}`;
+      
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${upiId}%26pn=${encodeURIComponent(payeeName)}%26am=${amount}%26cu=INR%26tn=${encodeURIComponent(transactionNote)}`;
+
+      return `
+        <div class="modal-overlay" style="display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;backdrop-filter:blur(8px);">
+          <div class="card-flat" style="max-width:400px;width:90%;padding:var(--space-xl);text-align:center;position:relative;animation:slideUp 0.3s ease;">
+            <button class="btn-ghost" id="close-modal" style="position:absolute;top:10px;right:10px;font-size:1.5rem;">✕</button>
+            <h2 style="margin-bottom:var(--space-md);">Unlock Paper 🔓</h2>
+            <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:var(--space-lg);">
+              Scan the QR code with any UPI app (GPay, PhonePe, Paytm) to pay <strong>₹2.00</strong> to <strong>${payeeName}</strong>.
+            </p>
+            
+            <div style="background:white;padding:15px;border-radius:12px;display:inline-block;margin-bottom:var(--space-lg);box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+              <img src="${qrUrl}" alt="UPI QR Code" style="width:220px;height:220px;display:block;" />
+            </div>
+
+            <div style="font-family:var(--font-mono);font-size:0.85rem;color:var(--text-muted);margin-bottom:var(--space-xl);padding:10px;background:var(--bg-secondary);border-radius:8px;">
+              UPI ID: ${upiId}
+            </div>
+
+            <button class="btn btn-primary w-full" id="confirm-payment" style="width:100%;padding:12px;">✅ I Have Paid (Unlock Now)</button>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin-top:var(--space-md);">
+              * The payment goes directly to ${payeeName}.
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
     // ============ PDF SECTION ============
+
     function renderPDFSection(pdfList) {
       if (pdfList.length === 0) {
         return '<div class="card-flat"><div class="empty-state"><div class="empty-state-icon">📕</div><p class="empty-state-title">No PDF notes yet</p></div></div>';
@@ -313,6 +401,35 @@ export async function renderStudyMaterials() {
       document.getElementById('slide-prev')?.addEventListener('click', () => { if (activeSlideIndex > 0) { activeSlideIndex--; render(); } });
       document.getElementById('slide-next')?.addEventListener('click', () => { if (activeSlideIndex < activePPT.slides.length - 1) { activeSlideIndex++; render(); } });
       document.querySelectorAll('.slide-dot').forEach(dot => dot.addEventListener('click', () => { activeSlideIndex = parseInt(dot.dataset.index); render(); }));
+
+      // Purchase flow
+      document.querySelectorAll('.buy-btn').forEach(btn => btn.addEventListener('click', () => {
+        payingForMaterial = pqqs.find(p => p.id === btn.dataset.id);
+        render();
+      }));
+
+      document.getElementById('close-modal')?.addEventListener('click', () => {
+        payingForMaterial = null;
+        render();
+      });
+
+      document.getElementById('confirm-payment')?.addEventListener('click', async () => {
+        const btn = document.getElementById('confirm-payment');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner" style="width:18px;height:18px;"></div> Unlocking...';
+
+        try {
+          await materialsApi.purchase(payingForMaterial.id);
+          // Refresh list to update purchased status
+          const updatedMaterials = await materialsApi.list();
+          // We need to update the data in the scope
+          renderStudyMaterials(); // Re-render everything from scratch for simplicity
+        } catch (err) {
+          alert('Error: ' + err.message);
+          btn.disabled = false;
+          btn.textContent = '✅ I Have Paid (Unlock Now)';
+        }
+      });
     }
 
     render();

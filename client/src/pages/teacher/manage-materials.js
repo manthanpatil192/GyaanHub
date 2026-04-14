@@ -20,17 +20,18 @@ export async function renderTeacherMaterials(initialTab = 'overview') {
       const videos = allMaterials.filter(m => m.type === 'video');
       const ppts = allMaterials.filter(m => m.type === 'ppt');
       const pdfs = allMaterials.filter(m => m.type === 'pdf');
+      const pqqs = allMaterials.filter(m => m.type === 'pqqs');
 
       const content = `
         <div class="page-header">
           <div>
             <h1 class="page-title">Manage Materials 📂</h1>
-            <p class="page-subtitle">Upload PDFs, add videos, and manage study resources</p>
+            <p class="page-subtitle">Upload PDFs, PQQ papers, videos, and manage study resources</p>
           </div>
         </div>
 
         <!-- Stats -->
-        <div class="stats-grid" style="margin-bottom:var(--space-xl);grid-template-columns:repeat(4,1fr);">
+        <div class="stats-grid" style="margin-bottom:var(--space-xl);grid-template-columns:repeat(5,1fr);">
           <div class="stat-card blue">
             <div class="stat-card-header">
               <span class="stat-card-label">Videos</span>
@@ -54,6 +55,13 @@ export async function renderTeacherMaterials(initialTab = 'overview') {
           </div>
           <div class="stat-card amber">
             <div class="stat-card-header">
+              <span class="stat-card-label">PQQ Papers</span>
+              <div class="stat-card-icon">💰</div>
+            </div>
+            <div class="stat-card-value">${pqqs.length}</div>
+          </div>
+          <div class="stat-card indigo">
+            <div class="stat-card-header">
               <span class="stat-card-label">Total</span>
               <div class="stat-card-icon">📚</div>
             </div>
@@ -65,12 +73,14 @@ export async function renderTeacherMaterials(initialTab = 'overview') {
         <div class="tab-bar" style="margin-bottom:var(--space-xl);">
           <button class="tab-btn ${activeTab === 'overview' ? 'tab-active' : ''}" data-tab="overview">📋 All Materials</button>
           <button class="tab-btn ${activeTab === 'upload-pdf' ? 'tab-active' : ''}" data-tab="upload-pdf">📕 Upload PDF</button>
+          <button class="tab-btn ${activeTab === 'upload-pqq' ? 'tab-active' : ''}" data-tab="upload-pqq">💰 PQQ Papers</button>
           <button class="tab-btn ${activeTab === 'add-video' ? 'tab-active' : ''}" data-tab="add-video">🎥 Add Video</button>
         </div>
 
         <div id="tab-content">
           ${activeTab === 'overview' ? renderOverview(allMaterials) : ''}
           ${activeTab === 'upload-pdf' ? renderPDFUpload() : ''}
+          ${activeTab === 'upload-pqq' ? renderPQQUpload() : ''}
           ${activeTab === 'add-video' ? renderVideoForm() : ''}
         </div>
       `;
@@ -111,8 +121,9 @@ export async function renderTeacherMaterials(initialTab = 'overview') {
               ${mats.map(m => `
                 <tr>
                   <td>
-                    <span style="font-size:1.3rem;">${m.type === 'video' ? '🎥' : m.type === 'ppt' ? '📑' : '📕'}</span>
-                    <span class="badge badge-${m.type === 'video' ? 'blue' : m.type === 'ppt' ? 'purple' : 'emerald'}" style="margin-left:6px;">${m.type.toUpperCase()}</span>
+                    <span style="font-size:1.3rem;">${m.type === 'video' ? '🎥' : m.type === 'ppt' ? '📑' : m.type === 'pqqs' ? '💰' : '📕'}</span>
+                    <span class="badge badge-${m.type === 'video' ? 'blue' : m.type === 'ppt' ? 'purple' : m.type === 'pqqs' ? 'amber' : 'emerald'}" style="margin-left:6px;">${m.type.toUpperCase()}</span>
+                    ${m.price > 0 ? `<div style="font-size:0.75rem;color:var(--accent-amber);font-weight:700;margin-top:2px;">₹${m.price}</div>` : ''}
                   </td>
                   <td>
                     <div style="font-weight:600;">${m.title}</div>
@@ -132,7 +143,78 @@ export async function renderTeacherMaterials(initialTab = 'overview') {
       `;
     }
 
+    function renderPQQUpload() {
+      return `
+        <div class="grid-2" style="gap:var(--space-xl);">
+          <!-- Upload Form -->
+          <div class="card-flat" style="padding:var(--space-xl);">
+            <h3 style="margin-bottom:var(--space-lg);display:flex;align-items:center;gap:8px;">💰 Upload PQQ Paper (Paid)</h3>
+
+            <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:var(--space-lg);">
+              These papers will be available to students for a fixed price of <strong>₹2</strong>.
+            </p>
+
+            <form id="pqq-upload-form" enctype="multipart/form-data">
+              <div class="form-group">
+                <label class="form-label">Paper Title *</label>
+                <input type="text" class="form-input" id="pqq-title" placeholder="e.g., DBMS Spring 2023 EndSem Paper" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea class="form-textarea" id="pqq-desc" rows="2" placeholder="Tell students what this paper covers..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Module (optional)</label>
+                <select class="form-input" id="pqq-module">
+                  <option value="">— General —</option>
+                  ${allModules.map(m => `<option value="${m.id}">${m.title}</option>`).join('')}
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Price (Fixed)</label>
+                <input type="text" class="form-input" value="₹ 2.00" disabled style="background:var(--bg-secondary);cursor:not-allowed;" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Question Paper (PDF) *</label>
+                <div id="pqq-drop-zone" style="border:2px dashed var(--accent-amber);border-radius:var(--radius-lg);padding:var(--space-2xl);text-align:center;cursor:pointer;transition:all 0.3s;background:var(--bg-glass);">
+                  <div style="font-size:2.5rem;margin-bottom:var(--space-sm);" id="pqq-drop-icon">📄</div>
+                  <div style="font-weight:600;margin-bottom:4px;" id="pqq-drop-text">Drop PQQ PDF here or browse</div>
+                  <input type="file" id="pqq-file" accept=".pdf" style="display:none;" />
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="pqq-upload-btn" disabled style="background:var(--accent-amber);border-color:var(--accent-amber);">
+                📤 Upload PQQ Paper
+              </button>
+            </form>
+          </div>
+
+          <!-- PQQ Info -->
+          <div>
+            <div class="card-flat" style="padding:var(--space-xl);margin-bottom:var(--space-lg);border-left:4px solid var(--accent-amber);">
+              <h3 style="margin-bottom:var(--space-md);">💡 About PQQ Section</h3>
+              <div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">
+                <p><strong>What is PQQ?</strong></p>
+                <p>Previous Question Papers (PQQ) are high-value resources. Students pay a nominal fee (₹2) to unlock access to these papers.</p>
+                <p style="margin-top:var(--space-md);"><strong>Rules:</strong></p>
+                <ul style="padding-left:18px;margin:var(--space-sm) 0;">
+                  <li>Only PDF files are accepted</li>
+                  <li>Price is currently fixed at ₹2</li>
+                  <li>Once uploaded, students can see the title but not the content until payment</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function renderPDFUpload() {
+      // Existing code... (identical to current)
       return `
         <div class="grid-2" style="gap:var(--space-xl);">
           <!-- Upload Form -->
@@ -331,12 +413,67 @@ export async function renderTeacherMaterials(initialTab = 'overview') {
         });
       }
 
-      function handleFileSelect(file) {
-        document.getElementById('drop-icon').textContent = '✅';
-        document.getElementById('drop-text').textContent = file.name;
-        document.getElementById('drop-hint').textContent = `${formatSize(file.size)} — Click to change`;
-        if (uploadBtn) uploadBtn.disabled = false;
+      function handleFileSelect(file, type = 'pdf') {
+        const iconId = type === 'pqq' ? 'pqq-drop-icon' : 'drop-icon';
+        const textId = type === 'pqq' ? 'pqq-drop-text' : 'drop-text';
+        const btnId = type === 'pqq' ? 'pqq-upload-btn' : 'upload-btn';
+
+        document.getElementById(iconId).textContent = '✅';
+        document.getElementById(textId).textContent = file.name;
+        if (type === 'pdf') document.getElementById('drop-hint').textContent = `${formatSize(file.size)} — Click to change`;
+        
+        const btn = document.getElementById(btnId);
+        if (btn) btn.disabled = false;
       }
+
+      // PQQ Drop zone
+      const pqqDropZone = document.getElementById('pqq-drop-zone');
+      const pqqFileInput = document.getElementById('pqq-file');
+      if (pqqDropZone && pqqFileInput) {
+        pqqDropZone.addEventListener('click', () => pqqFileInput.click());
+        pqqDropZone.addEventListener('dragover', (e) => { e.preventDefault(); pqqDropZone.style.borderColor = 'var(--accent-amber)'; });
+        pqqDropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          if (e.dataTransfer.files.length > 0) {
+            pqqFileInput.files = e.dataTransfer.files;
+            handleFileSelect(e.dataTransfer.files[0], 'pqq');
+          }
+        });
+        pqqFileInput.addEventListener('change', () => {
+          if (pqqFileInput.files.length > 0) handleFileSelect(pqqFileInput.files[0], 'pqq');
+        });
+      }
+
+      // PQQ Upload form
+      document.getElementById('pqq-upload-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('pqq-upload-btn');
+        const file = document.getElementById('pqq-file').files[0];
+        if (!file) { showToast('Please select a file', 'warning'); return; }
+
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;"></div> Uploading...';
+
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('title', document.getElementById('pqq-title').value);
+          formData.append('description', document.getElementById('pqq-desc').value);
+          formData.append('module_id', document.getElementById('pqq-module').value);
+          formData.append('type', 'pqqs');
+          formData.append('price', '2');
+
+          const result = await materialsApi.uploadFile(formData);
+          allMaterials.unshift(result);
+          showToast(`PQQ Paper "${result.title}" uploaded! 💰`, 'success');
+          activeTab = 'overview';
+          render();
+        } catch (err) {
+          showToast(`Upload failed: ${err.message}`, 'error');
+          btn.disabled = false;
+          btn.innerHTML = '📤 Upload PQQ Paper';
+        }
+      });
 
       // PDF Upload form
       document.getElementById('pdf-upload-form')?.addEventListener('submit', async (e) => {
