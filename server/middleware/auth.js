@@ -1,21 +1,30 @@
-import db from '../db/schema.js';
+import { supabase } from '../utils/supabase.js';
 
-export function authenticate(req, res, next) {
+export async function authenticate(req, res, next) {
   const token = req.headers.authorization?.replace('Bearer ', '');
 
   if (!token) {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  const user = db.findOne('users', u => u.id === token);
+  try {
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', token)
+      .single();
 
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid token' });
+    if (error || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    const { password_hash, ...safeUser } = user;
+    req.user = safeUser;
+    next();
+  } catch (err) {
+    console.error('Auth middleware error:', err);
+    res.status(500).json({ error: 'Internal server error in auth' });
   }
-
-  const { password_hash, ...safeUser } = user;
-  req.user = safeUser;
-  next();
 }
 
 export function requireRole(role) {
