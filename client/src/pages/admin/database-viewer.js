@@ -3,7 +3,7 @@ const API_BASE = 'https://gyaanhub-backend.onrender.com/api';
 export async function renderDatabaseViewer() {
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div style="padding: 20px; font-family: monospace; background: #fff; min-height: 100vh;">
+        <div style="padding: 20px; font-family: monospace; background: #fff; color: #333; min-height: 100vh;">
             <h2>🗄️ PostgreSQL Cloud Database View</h2>
             <p style="color: #666; margin-bottom: 20px;">Live direct dump from Supabase connected to Render.</p>
             <div id="db-content">
