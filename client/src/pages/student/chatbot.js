@@ -53,11 +53,7 @@ export function renderChatbot() {
     testBtn.textContent = '⌛ Testing...';
     try {
       const res = await request('/chatbot/status');
-      if (res.apiKeyConfigured) {
-        showStatus(`✅ Connected to Backend. Gemini API Key is configured (${res.apiKeyPreview}).`, 'success');
-      } else {
-        showStatus('❌ Backend connected, but GEMINI_API_KEY is missing in server .env', 'error');
-      }
+      showStatus(`✅ Connected to Backend. Mode: ${res.mode}. Engine: ${res.engine}.`, 'success');
     } catch (err) {
       showStatus(`❌ Connection Failed: ${err.message}`, 'error');
     } finally {
