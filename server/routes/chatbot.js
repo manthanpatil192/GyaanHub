@@ -1,22 +1,45 @@
 import express from 'express';
-
 import https from 'https';
 
 const router = express.Router();
 
+// Helper to mask API key for logging
+const maskKey = (key) => key ? `${key.slice(0, 4)}...${key.slice(-4)}` : 'MISSING';
+
+// Health check / Status endpoint
+router.get('/status', (req, res) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  res.json({
+    status: 'ok',
+    apiKeyConfigured: !!apiKey,
+    apiKeyPreview: maskKey(apiKey),
+    engine: 'gemini-1.5-flash-8b'
+  });
+});
+
 router.post('/ask', async (req, res) => {
+  const requestId = Date.now().toString(36);
+  console.log(`[Chatbot:${requestId}] Request received:`, { 
+    hasMessage: !!req.body.message, 
+    historyLength: req.body.history?.length || 0 
+  });
+
   try {
     const { message, history } = req.body;
     
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
+      console.error(`[Chatbot:${requestId}] API Key missing`);
       return res.status(500).json({ error: 'Gemini API key not configured on server' });
     }
 
-    // Format history for Gemini API
     const contents = history ? history.map(msg => ({
       role: msg.role === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.text }]
+      parts: [{ text: msg.text || '' }]
     })) : [];
 
     contents.push({
@@ -27,66 +50,73 @@ router.post('/ask', async (req, res) => {
     const postData = JSON.stringify({
       contents,
       systemInstruction: {
-        parts: [{ text: "You are a helpful DBMS (Database Management Systems) tutor for students. Answer questions clearly but VERY concisely. Keep responses extremely brief and focused." }]
+        parts: [{ text: "You are a helpful DBMS tutor. Be concise, clear, and professional." }]
       },
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 250
+        maxOutputTokens: 500
       }
     });
 
-    // Use gemini-1.5-flash-8b for maximum speed and https to avoid Node fetch hangs
     const options = {
       hostname: 'generativelanguage.googleapis.com',
       port: 443,
-      path: \`/v1beta/models/gemini-1.5-flash-8b:generateContent?key=\${apiKey}\`,
+      path: `/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${apiKey}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(postData)
       },
-      timeout: 10000 // 10 seconds timeout
+      timeout: 15000 // 15 seconds
     };
 
     const reqPost = https.request(options, (resPost) => {
       let dataChunks = '';
-
-      resPost.on('data', (chunk) => {
-        dataChunks += chunk;
-      });
-
+      resPost.on('data', (chunk) => { dataChunks += chunk; });
       resPost.on('end', () => {
         try {
           const data = JSON.parse(dataChunks);
           if (resPost.statusCode !== 200) {
-            console.error("Gemini API Error:", data);
-            return res.status(500).json({ error: data.error?.message || 'Failed to get response from Gemini API' });
+            console.error(`[Chatbot:${requestId}] Gemini API Error (${resPost.statusCode}):`, data);
+            return res.status(resPost.statusCode).json({ 
+              error: data.error?.message || 'Gemini API returned an error',
+              details: data.error
+            });
           }
 
-          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I couldn't generate a response.";
+          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+          console.log(`[Chatbot:${requestId}] Success`);
           res.json({ reply });
         } catch (e) {
-          res.status(500).json({ error: 'Invalid JSON response from AI provider' });
+          console.error(`[Chatbot:${requestId}] JSON Parse Error:`, e.message);
+          res.status(500).json({ error: 'Failed to parse AI response' });
         }
       });
     });
 
     reqPost.on('error', (e) => {
-      console.error("Chatbot Request Error:", e);
-      res.status(500).json({ error: 'Failed to communicate with AI endpoint' });
+      console.error(`[Chatbot:${requestId}] Network Error:`, e.message);
+      if (!res.headersSent) {
+        res.status(502).json({ error: 'Failed to connect to AI server: ' + e.message });
+      }
     });
 
     reqPost.on('timeout', () => {
+      console.error(`[Chatbot:${requestId}] Timeout triggered`);
       reqPost.destroy();
-      res.status(504).json({ error: 'AI generation request timed out' });
+      if (!res.headersSent) {
+        res.status(504).json({ error: 'AI request timed out after 15s' });
+      }
     });
 
     reqPost.write(postData);
     reqPost.end();
 
   } catch (err) {
-    console.error("Chatbot Error:", err);
-    res.status(500).json({ error: 'Internal server error while processing request' });
+    console.error(`[Chatbot:${requestId}] Unexpected Error:`, err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
 });
 

@@ -8,18 +8,41 @@ function getHeaders() {
 }
 
 export async function request(path, options = {}) {
-  const response = await fetch(`${API_BASE}${path}`, {
-    headers: getHeaders(),
-    ...options
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
 
-  const data = await response.json();
+  try {
+    const response = await fetch(`${API_BASE}${path}`, {
+      headers: getHeaders(),
+      signal: controller.signal,
+      ...options
+    });
 
-  if (!response.ok) {
-    throw new Error(data.error || 'Something went wrong');
+    clearTimeout(timeoutId);
+
+    const contentType = response.headers.get('content-type');
+    let data;
+
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      data = { error: text || `Server returned ${response.status} ${response.statusText}` };
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || data.message || 'Something went wrong');
+    }
+
+    return data;
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('Request timed out. The server might be waking up (Render free tier). Please try again in 30 seconds.');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  return data;
 }
 
 // Auth
