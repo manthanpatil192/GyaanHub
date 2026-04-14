@@ -7,7 +7,7 @@ function getHeaders() {
   return headers;
 }
 
-async function request(path, options = {}) {
+export async function request(path, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     headers: getHeaders(),
     ...options
