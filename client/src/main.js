@@ -7,6 +7,7 @@ import { renderQuizList, renderQuiz } from './pages/student/quiz.js';
 import { renderStudentResults, renderAttemptReview } from './pages/student/results.js';
 import { renderStudyMaterials } from './pages/student/materials.js';
 import { renderERSimulator } from './pages/student/er-simulator.js';
+import { renderChatbot } from './pages/student/chatbot.js';
 import { renderTeacherDashboard } from './pages/teacher/dashboard.js';
 import { renderCreateQuiz } from './pages/teacher/create-quiz.js';
 import { renderManageQuizzes, renderQuizResults } from './pages/teacher/manage-quizzes.js';
@@ -61,6 +62,7 @@ registerRoute('/student/results', requireStudent(() => renderStudentResults()));
 registerRoute('/student/result/:id', requireStudent((params) => renderAttemptReview(params.id)));
 registerRoute('/student/materials', requireStudent(() => renderStudyMaterials()));
 registerRoute('/student/er-simulator', requireStudent(() => renderERSimulator()));
+registerRoute('/student/chatbot', requireStudent(() => renderChatbot()));
 
 // Teacher routes
 registerRoute('/teacher/dashboard', requireTeacher(() => renderTeacherDashboard()));

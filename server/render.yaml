@@ -13,3 +13,5 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+      - key: GEMINI_API_KEY
+        value: "AIzaSyCjMYlTMnXQsmsVGEDR1z7u_zpyUc5OV-Y"

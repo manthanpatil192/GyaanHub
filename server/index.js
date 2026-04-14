@@ -9,6 +9,7 @@ import moduleRoutes from './routes/modules.js';
 import resultRoutes from './routes/results.js';
 import materialRoutes from './routes/materials.js';
 import erDiagramRoutes from './routes/er_diagrams.js';
+import chatbotRoutes from './routes/chatbot.js';
 
 // Load environment variables
 dotenv.config();
@@ -32,6 +33,7 @@ app.use('/api/modules', moduleRoutes);
 app.use('/api/results', resultRoutes);
 app.use('/api/materials', materialRoutes);
 app.use('/api/er-diagrams', erDiagramRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 import { supabase } from './utils/supabase.js';
 

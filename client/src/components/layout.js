@@ -51,6 +51,9 @@ export function renderLayout(contentHtml, activePage = '') {
     <div class="sidebar-link ${activePage === 'er-simulator' ? 'active' : ''}" data-page="/student/er-simulator">
       <span class="icon">📐</span> ER Simulator
     </div>
+    <div class="sidebar-link ${activePage === 'doubt-chatbot' ? 'active' : ''}" data-page="/student/chatbot">
+      <span class="icon">🤖</span> Doubt Chatbot
+    </div>
     <div class="sidebar-section-title">Performance</div>
     <div class="sidebar-link ${activePage === 'results' ? 'active' : ''}" data-page="/student/results">
       <span class="icon">📈</span> My Results

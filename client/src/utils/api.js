@@ -103,3 +103,11 @@ export const materials = {
     return data;
   }
 };
+
+// Chatbot
+export const chatbot = {
+  ask: (message, history) => request('/chatbot/ask', {
+    method: 'POST',
+    body: JSON.stringify({ message, history })
+  })
+};
