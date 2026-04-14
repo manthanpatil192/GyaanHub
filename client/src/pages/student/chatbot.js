@@ -7,7 +7,7 @@ export function renderChatbot() {
   const content = `
     <div class="page-header">
       <div>
-        <h1 class="page-title">🤖 Doubt Chatbot (Gemini)</h1>
+        <h1 class="page-title">🤖 Doubt Chatbot (Groq API)</h1>
         <p class="page-subtitle">Ask your DBMS questions here and get instant answers from our AI assistant!</p>
       </div>
       <div class="page-header-actions">
