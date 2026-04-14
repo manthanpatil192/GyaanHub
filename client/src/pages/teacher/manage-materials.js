@@ -2,16 +2,19 @@ import { renderLayout } from '../../components/layout.js';
 import { materials as materialsApi, modules as modulesApi } from '../../utils/api.js';
 import { showToast } from '../../components/shared.js';
 
-export async function renderTeacherMaterials() {
+export async function renderTeacherMaterials(initialTab = 'overview') {
   renderLayout(`<div class="loading-spinner"><div class="spinner"></div></div>`, 'materials');
 
   try {
     const [allMaterials, allModules] = await Promise.all([
       materialsApi.list(),
       modulesApi.list()
-    ]);
+    ]).catch(err => {
+      console.error('Data fetching error:', err);
+      throw new Error('Could not fetch materials or modules. Technical details: ' + err.message);
+    });
 
-    let activeTab = 'overview';
+    let activeTab = initialTab;
 
     function render() {
       const videos = allMaterials.filter(m => m.type === 'video');

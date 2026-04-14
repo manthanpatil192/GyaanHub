@@ -30,6 +30,7 @@ export async function renderTeacherDashboard() {
         </div>
         <div style="display:flex;gap:var(--space-sm);">
           <button class="btn btn-primary" id="create-quiz-btn">✏️ Create Quiz</button>
+          <button class="btn btn-emerald" id="quick-upload-btn">📕 Quick Upload PDF</button>
           <button class="btn btn-secondary" id="manage-materials-btn">📂 Manage Materials</button>
           <button class="btn btn-secondary" id="create-module-btn">📚 Add Module</button>
         </div>
@@ -166,6 +167,7 @@ export async function renderTeacherDashboard() {
     }
 
     document.getElementById('create-quiz-btn').addEventListener('click', () => navigate('/teacher/create-quiz'));
+    document.getElementById('quick-upload-btn').addEventListener('click', () => navigate('/teacher/materials/upload-pdf'));
     document.getElementById('manage-materials-btn').addEventListener('click', () => navigate('/teacher/materials'));
     document.getElementById('create-module-btn').addEventListener('click', () => navigate('/teacher/modules'));
 

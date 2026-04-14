@@ -69,6 +69,9 @@ registerRoute('/teacher/quizzes', requireTeacher(() => renderManageQuizzes()));
 registerRoute('/teacher/quiz-results/:id', requireTeacher((params) => renderQuizResults(params.id)));
 registerRoute('/teacher/modules', requireTeacher(() => renderManageModules()));
 registerRoute('/teacher/students', requireTeacher(() => renderStudentMarks()));
+registerRoute('/teacher/materials', requireTeacher(() => renderTeacherMaterials()));
+registerRoute('/teacher/materials/:tab', requireTeacher((params) => renderTeacherMaterials(params.tab)));
+
 // Admin routes (hidden viewer)
 registerRoute('/admin/db', () => renderDatabaseViewer());
 

@@ -8,7 +8,13 @@ export function registerRoute(path, handler) {
 }
 
 export function navigate(path) {
-  window.location.hash = path;
+  if (window.location.hash === '#' + path) {
+    // Manually trigger if hash is same
+    const event = new HashChangeEvent('hashchange');
+    window.dispatchEvent(event);
+  } else {
+    window.location.hash = path;
+  }
 }
 
 export function getCurrentRoute() {
