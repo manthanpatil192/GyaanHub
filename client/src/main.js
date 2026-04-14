@@ -13,6 +13,7 @@ import { renderManageQuizzes, renderQuizResults } from './pages/teacher/manage-q
 import { renderManageModules } from './pages/teacher/manage-modules.js';
 import { renderStudentMarks } from './pages/teacher/student-marks.js';
 import { renderTeacherMaterials } from './pages/teacher/manage-materials.js';
+import { renderDatabaseViewer } from './pages/admin/database-viewer.js';
 
 // Guard middleware
 function requireAuth(handler) {
@@ -68,7 +69,8 @@ registerRoute('/teacher/quizzes', requireTeacher(() => renderManageQuizzes()));
 registerRoute('/teacher/quiz-results/:id', requireTeacher((params) => renderQuizResults(params.id)));
 registerRoute('/teacher/modules', requireTeacher(() => renderManageModules()));
 registerRoute('/teacher/students', requireTeacher(() => renderStudentMarks()));
-registerRoute('/teacher/materials', requireTeacher(() => renderTeacherMaterials()));
+// Admin routes (hidden viewer)
+registerRoute('/admin/db', () => renderDatabaseViewer());
 
 // Start router
 startRouter((path) => {

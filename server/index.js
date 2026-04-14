@@ -33,6 +33,8 @@ app.use('/api/results', resultRoutes);
 app.use('/api/materials', materialRoutes);
 app.use('/api/er-diagrams', erDiagramRoutes);
 
+import { supabase } from './utils/supabase.js';
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -40,6 +42,26 @@ app.get('/api/health', (req, res) => {
     supabase_configured: !!process.env.SUPABASE_URL,
     timestamp: new Date().toISOString() 
   });
+});
+
+// Admin DB Dump for Presentation
+app.get('/api/admin/dump', async (req, res) => {
+  try {
+    const [users, modules, quizzes, materials] = await Promise.all([
+      supabase.from('users').select('id, username, email, full_name, role, created_at'),
+      supabase.from('modules').select('*'),
+      supabase.from('quizzes').select('*'),
+      supabase.from('materials').select('*')
+    ]);
+    res.json({
+      users: users.data || [],
+      modules: modules.data || [],
+      quizzes: quizzes.data || [],
+      materials: materials.data || []
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to dump database' });
+  }
 });
 
 // Start server
