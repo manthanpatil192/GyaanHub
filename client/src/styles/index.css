@@ -1597,3 +1597,36 @@ details[open] summary::before {
 #slide-viewport {
   transition: opacity 0.2s ease;
 }
+/* Tab Navigation Styles */
+.tab-bar {
+  display: flex;
+  gap: 10px;
+  background: var(--bg-surface);
+  padding: 10px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.tab-btn.tab-active {
+  background: var(--accent-blue);
+  color: white;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
+}

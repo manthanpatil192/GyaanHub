@@ -10,18 +10,8 @@ import { authenticate, requireRole } from '../middleware/auth.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '..', 'uploads');
-if (!existsSync(uploadsDir)) mkdirSync(uploadsDir, { recursive: true });
-
-// Multer config for PDF uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${uuid()}${ext}`);
-  }
-});
+// Use memory storage for direct cloud streaming
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
@@ -132,13 +122,37 @@ router.post('/upload', authenticate, requireRole('teacher'), upload.single('file
 
     const { title, description, module_id } = req.body;
 
+    // Ensure bucket exists (ignores error if it already does)
+    await supabase.storage.createBucket('materials', { public: true });
+
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const fileName = `${uuid()}${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('materials')
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: true
+      });
+
+    if (uploadError) {
+        console.error('Storage upload error:', uploadError);
+        throw new Error('Failed to upload file to cloud storage');
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('materials')
+      .getPublicUrl(fileName);
+
+    const publicUrl = publicUrlData.publicUrl;
+
     const { data: material, error } = await supabase
       .from('materials')
       .insert([{
         title: title || req.file.originalname,
         description: description || `Uploaded file: ${req.file.originalname}`,
         type: 'pdf',
-        url: `/uploads/${req.file.filename}`, // Use local server path for now
+        url: publicUrl,
         module_id: module_id || null,
         created_by: req.user.id
       }])
