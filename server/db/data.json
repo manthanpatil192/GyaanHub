@@ -1,0 +1,2129 @@
+{
+  "users": [
+    {
+      "id": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "username": "prof_sharma",
+      "email": "sharma@university.edu",
+      "password_hash": "$2a$10$g0M25GR.pVDsiOp1g.jdnOn1Y400jdpfcE7dllIeeFuf.kBe4CBdW",
+      "full_name": "Prof. Anil Sharma",
+      "role": "teacher",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "fc0001ad-853e-4a4f-8b8c-b65e8ef10432",
+      "username": "rahul_student",
+      "email": "rahul@student.edu",
+      "password_hash": "$2a$10$g0M25GR.pVDsiOp1g.jdnOn1Y400jdpfcE7dllIeeFuf.kBe4CBdW",
+      "full_name": "Rahul Kumar",
+      "role": "student",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "b0196de1-112c-46db-9487-1a2441336d80",
+      "username": "priya_student",
+      "email": "priya@student.edu",
+      "password_hash": "$2a$10$g0M25GR.pVDsiOp1g.jdnOn1Y400jdpfcE7dllIeeFuf.kBe4CBdW",
+      "full_name": "Priya Patel",
+      "role": "student",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "3eee93b2-b2cd-45c5-9bf3-2ab7d1515ce3",
+      "username": "amit_student",
+      "email": "amit@student.edu",
+      "password_hash": "$2a$10$g0M25GR.pVDsiOp1g.jdnOn1Y400jdpfcE7dllIeeFuf.kBe4CBdW",
+      "full_name": "Amit Singh",
+      "role": "student",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    }
+  ],
+  "modules": [
+    {
+      "id": "b0754b49-593a-40da-ba4c-9a463a33efff",
+      "title": "Introduction to DBMS",
+      "description": "Learn the fundamentals of Database Management Systems, their types, and advantages over file systems.",
+      "content": "# Introduction to DBMS\n\n## What is a Database?\nA **database** is an organized collection of structured information, or data, typically stored electronically in a computer system.\n\n## What is a DBMS?\nA **Database Management System** is a software system designed to manage and organize data in a structured way.\n\n## Types of DBMS\n1. **Hierarchical DBMS** — Data organized in a tree-like structure\n2. **Network DBMS** — Uses a graph structure with many-to-many relationships\n3. **Relational DBMS (RDBMS)** — Data stored in tables with rows and columns (e.g., MySQL, PostgreSQL)\n4. **Object-oriented DBMS** — Data stored as objects\n5. **NoSQL DBMS** — Non-relational databases for unstructured data (e.g., MongoDB)\n\n## Advantages of DBMS over File Systems\n| Feature | File System | DBMS |\n|---------|------------|------|\n| Data Redundancy | High | Controlled |\n| Data Consistency | Difficult | Ensured |\n| Data Sharing | Limited | Easy |\n| Security | Basic | Advanced |\n| Backup & Recovery | Manual | Automatic |\n\n## ACID Properties\n- **Atomicity**: All or nothing — a transaction is either fully completed or fully aborted\n- **Consistency**: Database moves from one valid state to another\n- **Isolation**: Concurrent transactions don't interfere with each other\n- **Durability**: Once committed, changes persist even after system failure",
+      "category": "Fundamentals",
+      "difficulty": "beginner",
+      "icon": "🗄️",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "82910a96-074d-4059-b2f9-596dd466b99d",
+      "title": "ER Diagrams & Data Modeling",
+      "description": "Master Entity-Relationship diagrams, entities, attributes, relationships, and cardinality.",
+      "content": "# Entity-Relationship (ER) Diagrams\n\n## What is an ER Diagram?\nAn **ER Diagram** is a visual representation of entities and the relationships between them within a database.\n\n## Components\n\n### 1. Entity\n- **Strong Entity**: Can be uniquely identified by its own attributes\n- **Weak Entity**: Cannot be identified without a strong entity\n\n### 2. Attributes\n- **Simple**: Cannot be divided further (e.g., Age)\n- **Composite**: Can be divided (e.g., Full Name → First + Last)\n- **Derived**: Calculated from other attributes (e.g., Age from DOB)\n- **Multi-valued**: Can have multiple values (e.g., Phone Numbers)\n- **Key**: Uniquely identifies an entity\n\n### 3. Relationships\n- **One-to-One (1:1)**\n- **One-to-Many (1:N)**\n- **Many-to-Many (M:N)**\n\n## Participation Constraints\n- **Total Participation**: Every entity must participate (double line)\n- **Partial Participation**: Some entities may not participate (single line)",
+      "category": "Data Modeling",
+      "difficulty": "beginner",
+      "icon": "📊",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "facbcb9e-3f7a-4e4e-8cba-1f80f0c2b4b0",
+      "title": "Normalization",
+      "description": "Understand database normalization from 1NF to BCNF with practical examples.",
+      "content": "# Database Normalization\n\n## What is Normalization?\n**Normalization** is the process of organizing data in a database to reduce redundancy and improve data integrity.\n\n## Normal Forms\n\n### First Normal Form (1NF)\n- All columns contain atomic (indivisible) values\n- Each row is uniquely identifiable\n\n### Second Normal Form (2NF)\n- It is in 1NF\n- All non-key attributes are fully functionally dependent on the primary key\n\n### Third Normal Form (3NF)\n- It is in 2NF\n- No transitive dependencies exist\n\n### Boyce-Codd Normal Form (BCNF)\n- It is in 3NF\n- For every functional dependency X → Y, X is a super key\n\n## Functional Dependencies\nA functional dependency **X → Y** means the value of X uniquely determines the value of Y.\n\n## Denormalization\nSometimes we intentionally introduce redundancy for **performance optimization** in read-heavy applications.",
+      "category": "Database Design",
+      "difficulty": "intermediate",
+      "icon": "🔧",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "bc0bc089-25a5-4c9c-9aec-05078b2cb778",
+      "title": "SQL Fundamentals",
+      "description": "Learn SQL from basics — DDL, DML, DCL commands with practical query examples.",
+      "content": "# SQL Fundamentals\n\n## What is SQL?\n**Structured Query Language (SQL)** is a standard language for managing and manipulating relational databases.\n\n## SQL Command Categories\n\n### DDL (Data Definition Language)\n```sql\nCREATE TABLE students (\n    id INT PRIMARY KEY AUTO_INCREMENT,\n    name VARCHAR(100) NOT NULL,\n    email VARCHAR(150) UNIQUE\n);\n\nALTER TABLE students ADD COLUMN phone VARCHAR(15);\nDROP TABLE students;\nTRUNCATE TABLE students;\n```\n\n### DML (Data Manipulation Language)\n```sql\nINSERT INTO students (name, email) VALUES ('Rahul', 'rahul@email.com');\nSELECT name, email FROM students WHERE age > 18 ORDER BY name;\nUPDATE students SET department = 'IT' WHERE id = 1;\nDELETE FROM students WHERE id = 5;\n```\n\n### Important Clauses\n```sql\nSELECT department, COUNT(*) as total, AVG(age) as avg_age\nFROM students\nGROUP BY department\nHAVING COUNT(*) > 5;\n\nSELECT s.name, c.course_name\nFROM students s\nINNER JOIN enrollments e ON s.id = e.student_id\nINNER JOIN courses c ON e.course_id = c.id;\n```",
+      "category": "SQL",
+      "difficulty": "beginner",
+      "icon": "💻",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "74253705-7ad5-4fce-8902-070b48e5d1e9",
+      "title": "Transactions & Concurrency Control",
+      "description": "Deep dive into transaction management, ACID properties, locking, and deadlocks.",
+      "content": "# Transactions & Concurrency Control\n\n## What is a Transaction?\nA **transaction** is a sequence of database operations treated as a single logical unit.\n\n## Transaction States\n1. **Active** — Being executed\n2. **Partially Committed** — Final operation executed\n3. **Committed** — Successfully completed\n4. **Failed** — Error occurred\n5. **Aborted** — Rolled back\n\n## Concurrency Problems\n1. **Lost Update** — Two transactions update same data; one is lost\n2. **Dirty Read** — Reading uncommitted data\n3. **Non-repeatable Read** — Different values on re-reading\n4. **Phantom Read** — New rows appear in re-executed query\n\n## Isolation Levels\n| Level | Dirty Read | Non-repeatable | Phantom |\n|-------|-----------|----------------|--------|\n| Read Uncommitted | Possible | Possible | Possible |\n| Read Committed | Prevented | Possible | Possible |\n| Repeatable Read | Prevented | Prevented | Possible |\n| Serializable | Prevented | Prevented | Prevented |\n\n## Locking Mechanisms\n- **Shared Lock (S)**: Multiple transactions can read\n- **Exclusive Lock (X)**: Only one transaction can write\n- **Two-Phase Locking (2PL)**: Growing phase + Shrinking phase",
+      "category": "Transactions",
+      "difficulty": "advanced",
+      "icon": "🔒",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "8baf582a-0905-4245-8144-fe622478c455",
+      "title": "Indexing & Query Optimization",
+      "description": "Learn about B-Trees, hashing, indexing strategies, and how to optimize SQL queries.",
+      "content": "# Indexing & Query Optimization\n\n## What is Indexing?\nAn **index** improves the speed of data retrieval at the cost of additional storage and slower writes.\n\n## Types of Indexes\n- **Primary Index**: On the primary key column\n- **Secondary Index**: On non-primary key columns\n- **Clustered Index**: Determines physical order of data\n- **Non-Clustered Index**: Separate structure with pointers\n\n## Index Data Structures\n\n### B-Tree\n- Self-balancing tree\n- Search, Insert, Delete: O(log n)\n\n### B+ Tree\n- All data in leaf nodes\n- Leaves linked like a linked list\n- Better for range queries\n\n### Hash Index\n- Excellent for exact-match: O(1)\n- Poor for range queries\n\n## Optimization Tips\n- Use indexes on WHERE, JOIN, ORDER BY columns\n- Avoid SELECT * (fetch only needed columns)\n- Use EXISTS instead of IN for subqueries\n- Avoid functions on indexed columns in WHERE",
+      "category": "Performance",
+      "difficulty": "advanced",
+      "icon": "⚡",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "title": "DBMS Fundamentals Quiz",
+      "description": "Test your knowledge of basic DBMS concepts, types, and ACID properties.",
+      "module_id": "b0754b49-593a-40da-ba4c-9a463a33efff",
+      "time_limit_minutes": 10,
+      "total_points": 10,
+      "is_active": 1,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "title": "SQL Basics Quiz",
+      "description": "Test your SQL knowledge — DDL, DML, and basic query writing.",
+      "module_id": "bc0bc089-25a5-4c9c-9aec-05078b2cb778",
+      "time_limit_minutes": 15,
+      "total_points": 10,
+      "is_active": 1,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "fe27ac4a-192b-45c8-aee7-bf0feaa00a7f",
+      "title": "Normalization Quiz",
+      "description": "Test your understanding of database normalization from 1NF to BCNF.",
+      "module_id": "facbcb9e-3f7a-4e4e-8cba-1f80f0c2b4b0",
+      "time_limit_minutes": 12,
+      "total_points": 8,
+      "is_active": 1,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "6f6d8143-e36e-4c96-b0d1-115a7265b640",
+      "title": "Transactions & Concurrency Quiz",
+      "description": "Advanced quiz on transaction management and concurrency control.",
+      "module_id": "74253705-7ad5-4fce-8902-070b48e5d1e9",
+      "time_limit_minutes": 15,
+      "total_points": 8,
+      "is_active": 1,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "6708e7a5-b312-4a77-8784-241c3d91039a",
+      "title": "Advanced DBMS Scenarios",
+      "description": "Challenging scenario-based questions testing deep understanding of DBMS concepts. Requires analytical thinking and application of multiple concepts.",
+      "module_id": null,
+      "time_limit_minutes": 20,
+      "total_points": 12,
+      "is_active": 1,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "68a0660c-d050-41a0-9646-c6a9418ea397",
+      "title": "SQL Mastery Challenge",
+      "description": "Advanced SQL questions requiring query analysis, output prediction, and optimization knowledge. Not for beginners!",
+      "module_id": "bc0bc089-25a5-4c9c-9aec-05078b2cb778",
+      "time_limit_minutes": 18,
+      "total_points": 10,
+      "is_active": 1,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    }
+  ],
+  "questions": [
+    {
+      "id": "e6a660b4-c338-422c-a23e-5b7d5cb4845c",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "question_text": "What does DBMS stand for?",
+      "option_a": "Data Base Management System",
+      "option_b": "Database Management System",
+      "option_c": "Data Basic Management System",
+      "option_d": "Database Machine System",
+      "correct_option": "B",
+      "explanation": "DBMS stands for Database Management System.",
+      "points": 1,
+      "sort_order": 1
+    },
+    {
+      "id": "d50903b4-a3b1-43ba-ba17-4f952b6d3a25",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "question_text": "Which of the following is NOT an ACID property?",
+      "option_a": "Atomicity",
+      "option_b": "Consistency",
+      "option_c": "Independence",
+      "option_d": "Durability",
+      "correct_option": "C",
+      "explanation": "ACID = Atomicity, Consistency, Isolation, and Durability.",
+      "points": 1,
+      "sort_order": 2
+    },
+    {
+      "id": "46e25144-d0ba-4062-838c-30ceb0fb8ccd",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "question_text": "Which type of DBMS stores data in tables?",
+      "option_a": "Hierarchical",
+      "option_b": "Network",
+      "option_c": "Relational",
+      "option_d": "Object-oriented",
+      "correct_option": "C",
+      "explanation": "RDBMS stores data in tables with rows and columns.",
+      "points": 1,
+      "sort_order": 3
+    },
+    {
+      "id": "63fdfde9-6cab-4d88-acb9-fe7cc916226a",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "question_text": "What is a Schema in a database?",
+      "option_a": "The actual data stored",
+      "option_b": "A query language",
+      "option_c": "The structure/blueprint of the database",
+      "option_d": "A type of index",
+      "correct_option": "C",
+      "explanation": "A schema defines the structure of the database.",
+      "points": 1,
+      "sort_order": 4
+    },
+    {
+      "id": "183c4635-dd16-4bab-b71f-9b9a1bead94d",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "question_text": "Which property ensures \"all or nothing\"?",
+      "option_a": "Consistency",
+      "option_b": "Isolation",
+      "option_c": "Durability",
+      "option_d": "Atomicity",
+      "correct_option": "D",
+      "explanation": "Atomicity ensures all operations complete or none do.",
+      "points": 1,
+      "sort_order": 5
+    },
+    {
+      "id": "8a257dc2-4c33-45c6-8288-2455b958f0ad",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "question_text": "Data redundancy is better controlled in:",
+      "option_a": "File System",
+      "option_b": "DBMS",
+      "option_c": "Both equally",
+      "option_d": "Neither",
+      "correct_option": "B",
+      "explanation": "DBMS uses normalization to control redundancy.",
+      "points": 1,
+      "sort_order": 6
+    },
+    {
+      "id": "c5fc5f59-278b-4093-a147-1ec3a86f61b0",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "question_text": "What does Data Independence mean?",
+      "option_a": "Data can exist without a database",
+      "option_b": "Schema can change without affecting data",
+      "option_c": "Data is independent of users",
+      "option_d": "Data does not need backup",
+      "correct_option": "B",
+      "explanation": "Data independence: change schema without affecting data.",
+      "points": 1,
+      "sort_order": 7
+    },
+    {
+      "id": "5d922bd1-9699-4e2d-8577-38cad494496b",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "question_text": "Which is a NoSQL database?",
+      "option_a": "MySQL",
+      "option_b": "PostgreSQL",
+      "option_c": "MongoDB",
+      "option_d": "Oracle",
+      "correct_option": "C",
+      "explanation": "MongoDB is a NoSQL document-oriented database.",
+      "points": 1,
+      "sort_order": 8
+    },
+    {
+      "id": "d2a23c94-3573-49f9-a98c-60a2d50c7242",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "question_text": "A database instance refers to:",
+      "option_a": "The schema definition",
+      "option_b": "The data at a particular moment",
+      "option_c": "The database software",
+      "option_d": "The query optimizer",
+      "correct_option": "B",
+      "explanation": "An instance is the actual data at a moment in time.",
+      "points": 1,
+      "sort_order": 9
+    },
+    {
+      "id": "115142b0-4d9c-433f-b50d-c628d8d64729",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "question_text": "Which ACID property ensures committed data persists?",
+      "option_a": "Atomicity",
+      "option_b": "Consistency",
+      "option_c": "Isolation",
+      "option_d": "Durability",
+      "correct_option": "D",
+      "explanation": "Durability guarantees committed data remains permanent.",
+      "points": 1,
+      "sort_order": 10
+    },
+    {
+      "id": "59580dc5-6551-44fb-a1ac-9d8b93575b8a",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "question_text": "Which SQL command creates a new table?",
+      "option_a": "MAKE TABLE",
+      "option_b": "NEW TABLE",
+      "option_c": "CREATE TABLE",
+      "option_d": "ADD TABLE",
+      "correct_option": "C",
+      "explanation": "CREATE TABLE is the DDL command.",
+      "points": 1,
+      "sort_order": 1
+    },
+    {
+      "id": "0c5c9002-2824-4e5d-a4a8-389003708e15",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "question_text": "Which SQL clause filters rows?",
+      "option_a": "SELECT",
+      "option_b": "WHERE",
+      "option_c": "FROM",
+      "option_d": "ORDER BY",
+      "correct_option": "B",
+      "explanation": "WHERE filters rows based on conditions.",
+      "points": 1,
+      "sort_order": 2
+    },
+    {
+      "id": "cb49395e-794e-4faf-bc63-9eb051289bdc",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "question_text": "What does DML stand for?",
+      "option_a": "Data Manipulation Language",
+      "option_b": "Data Management Language",
+      "option_c": "Data Modeling Language",
+      "option_d": "Database Manipulation Language",
+      "correct_option": "A",
+      "explanation": "DML = Data Manipulation Language.",
+      "points": 1,
+      "sort_order": 3
+    },
+    {
+      "id": "97db5378-21a9-46e5-bca3-19208ba23ca0",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "question_text": "Which command removes all rows but keeps structure?",
+      "option_a": "DELETE",
+      "option_b": "DROP",
+      "option_c": "TRUNCATE",
+      "option_d": "REMOVE",
+      "correct_option": "C",
+      "explanation": "TRUNCATE removes data, preserves table structure.",
+      "points": 1,
+      "sort_order": 4
+    },
+    {
+      "id": "5e2d9202-ab8d-4c64-ba93-eec67397b47d",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "question_text": "Which JOIN returns all rows from both tables?",
+      "option_a": "INNER",
+      "option_b": "LEFT",
+      "option_c": "RIGHT",
+      "option_d": "FULL OUTER",
+      "correct_option": "D",
+      "explanation": "FULL OUTER JOIN returns all rows from both tables.",
+      "points": 1,
+      "sort_order": 5
+    },
+    {
+      "id": "17fe19c2-7850-4afa-9271-cb1849269cff",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "question_text": "Correct order of SQL clauses?",
+      "option_a": "SELECT, WHERE, FROM",
+      "option_b": "SELECT, FROM, WHERE, ORDER BY",
+      "option_c": "FROM, SELECT, WHERE",
+      "option_d": "SELECT, FROM, ORDER BY, WHERE",
+      "correct_option": "B",
+      "explanation": "SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY.",
+      "points": 1,
+      "sort_order": 6
+    },
+    {
+      "id": "b4b0df45-43da-4516-b552-603630a1b49e",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "question_text": "Which aggregate function counts rows?",
+      "option_a": "SUM()",
+      "option_b": "AVG()",
+      "option_c": "COUNT()",
+      "option_d": "TOTAL()",
+      "correct_option": "C",
+      "explanation": "COUNT() returns the number of matching rows.",
+      "points": 1,
+      "sort_order": 7
+    },
+    {
+      "id": "1fe8e6e4-beaf-4f5d-b0e5-7c48f03d2788",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "question_text": "LIKE operator with \"R%\" matches?",
+      "option_a": "Strings ending with R",
+      "option_b": "Strings containing R",
+      "option_c": "Strings starting with R",
+      "option_d": "Exact match R%",
+      "correct_option": "C",
+      "explanation": "\"R%\" matches strings starting with \"R\".",
+      "points": 1,
+      "sort_order": 8
+    },
+    {
+      "id": "e88a5c1a-2665-487d-988a-d73e8b398bfa",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "question_text": "Which SQL command gives permissions?",
+      "option_a": "ALLOW",
+      "option_b": "PERMIT",
+      "option_c": "GRANT",
+      "option_d": "ENABLE",
+      "correct_option": "C",
+      "explanation": "GRANT is the DCL command for permissions.",
+      "points": 1,
+      "sort_order": 9
+    },
+    {
+      "id": "d590785a-54dc-4ea0-bd97-31e5c6bbfe7c",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "question_text": "What does COMMIT do?",
+      "option_a": "Starts transaction",
+      "option_b": "Saves all changes permanently",
+      "option_c": "Rolls back changes",
+      "option_d": "Pauses transaction",
+      "correct_option": "B",
+      "explanation": "COMMIT saves changes permanently.",
+      "points": 1,
+      "sort_order": 10
+    },
+    {
+      "id": "91ba4042-3b59-4884-aa28-28474733ce90",
+      "quiz_id": "fe27ac4a-192b-45c8-aee7-bf0feaa00a7f",
+      "question_text": "Main goal of normalization?",
+      "option_a": "Increase redundancy",
+      "option_b": "Reduce redundancy and anomalies",
+      "option_c": "Speed up queries",
+      "option_d": "Add more tables",
+      "correct_option": "B",
+      "explanation": "Normalization reduces redundancy and prevents anomalies.",
+      "points": 1,
+      "sort_order": 1
+    },
+    {
+      "id": "636d5d66-8664-44a9-aef0-6a7a59ab27af",
+      "quiz_id": "fe27ac4a-192b-45c8-aee7-bf0feaa00a7f",
+      "question_text": "A table is in 1NF if:",
+      "option_a": "No redundant data",
+      "option_b": "All attributes are atomic",
+      "option_c": "No transitive dependencies",
+      "option_d": "Every determinant is candidate key",
+      "correct_option": "B",
+      "explanation": "1NF requires atomic (indivisible) values.",
+      "points": 1,
+      "sort_order": 2
+    },
+    {
+      "id": "bff4476e-7ee5-4b1c-a79c-8228caeb9c13",
+      "quiz_id": "fe27ac4a-192b-45c8-aee7-bf0feaa00a7f",
+      "question_text": "What does 2NF eliminate?",
+      "option_a": "Transitive dependencies",
+      "option_b": "Multi-valued dependencies",
+      "option_c": "Partial dependencies",
+      "option_d": "All redundancy",
+      "correct_option": "C",
+      "explanation": "2NF eliminates partial dependencies.",
+      "points": 1,
+      "sort_order": 3
+    },
+    {
+      "id": "11ee8e14-6985-403f-9fd0-006d3949a537",
+      "quiz_id": "fe27ac4a-192b-45c8-aee7-bf0feaa00a7f",
+      "question_text": "3NF eliminates which dependency?",
+      "option_a": "Partial",
+      "option_b": "Transitive",
+      "option_c": "Full",
+      "option_d": "Multi-valued",
+      "correct_option": "B",
+      "explanation": "3NF eliminates transitive dependencies.",
+      "points": 1,
+      "sort_order": 4
+    },
+    {
+      "id": "093022d0-5d04-4347-aaab-89178dc0e151",
+      "quiz_id": "fe27ac4a-192b-45c8-aee7-bf0feaa00a7f",
+      "question_text": "BCNF is stricter than:",
+      "option_a": "1NF only",
+      "option_b": "2NF only",
+      "option_c": "3NF",
+      "option_d": "None",
+      "correct_option": "C",
+      "explanation": "BCNF is a stricter version of 3NF.",
+      "points": 1,
+      "sort_order": 5
+    },
+    {
+      "id": "c5b014e6-0da0-4608-8a25-17ea6a6d02bf",
+      "quiz_id": "fe27ac4a-192b-45c8-aee7-bf0feaa00a7f",
+      "question_text": "What is a Functional Dependency?",
+      "option_a": "Relationship between tables",
+      "option_b": "When X uniquely determines Y",
+      "option_c": "A type of JOIN",
+      "option_d": "Constraint on data types",
+      "correct_option": "B",
+      "explanation": "X→Y means X uniquely determines Y.",
+      "points": 1,
+      "sort_order": 6
+    },
+    {
+      "id": "7bf13270-f2a8-45cd-863f-e9b03dca189b",
+      "quiz_id": "fe27ac4a-192b-45c8-aee7-bf0feaa00a7f",
+      "question_text": "Denormalization is done for:",
+      "option_a": "Better integrity",
+      "option_b": "Performance optimization",
+      "option_c": "Reducing tables",
+      "option_d": "Best practices",
+      "correct_option": "B",
+      "explanation": "Denormalization improves read performance.",
+      "points": 1,
+      "sort_order": 7
+    },
+    {
+      "id": "3b066311-651a-440c-b3fb-73739b09c485",
+      "quiz_id": "fe27ac4a-192b-45c8-aee7-bf0feaa00a7f",
+      "question_text": "Multi-valued attribute like \"Phone: 123, 456\" violates:",
+      "option_a": "2NF",
+      "option_b": "3NF",
+      "option_c": "1NF",
+      "option_d": "BCNF",
+      "correct_option": "C",
+      "explanation": "1NF requires atomic values.",
+      "points": 1,
+      "sort_order": 8
+    },
+    {
+      "id": "9e11c46c-d9ec-4eec-9d10-a5d78b86da75",
+      "quiz_id": "6f6d8143-e36e-4c96-b0d1-115a7265b640",
+      "question_text": "Transaction states are:",
+      "option_a": "Start, Run, Stop",
+      "option_b": "Active, Partially Committed, Committed, Failed, Aborted",
+      "option_c": "Begin, Process, End",
+      "option_d": "Open, Closed, Pending",
+      "correct_option": "B",
+      "explanation": "Active → Partially Committed → Committed (or Failed → Aborted).",
+      "points": 1,
+      "sort_order": 1
+    },
+    {
+      "id": "9ff1bb5e-1b66-4775-a922-914292c89d8b",
+      "quiz_id": "6f6d8143-e36e-4c96-b0d1-115a7265b640",
+      "question_text": "A \"Dirty Read\" occurs when:",
+      "option_a": "Data is corrupted",
+      "option_b": "An uncommitted value is read",
+      "option_c": "A transaction reads own data",
+      "option_d": "Query returns empty",
+      "correct_option": "B",
+      "explanation": "Dirty read: reading uncommitted data from another transaction.",
+      "points": 1,
+      "sort_order": 2
+    },
+    {
+      "id": "8d0c6d1c-aa26-4975-836f-ded732259e2e",
+      "quiz_id": "6f6d8143-e36e-4c96-b0d1-115a7265b640",
+      "question_text": "Which isolation level prevents all issues?",
+      "option_a": "Read Uncommitted",
+      "option_b": "Read Committed",
+      "option_c": "Repeatable Read",
+      "option_d": "Serializable",
+      "correct_option": "D",
+      "explanation": "Serializable is the strictest isolation level.",
+      "points": 1,
+      "sort_order": 3
+    },
+    {
+      "id": "eef87f5d-b2f5-477b-aeba-51065da10653",
+      "quiz_id": "6f6d8143-e36e-4c96-b0d1-115a7265b640",
+      "question_text": "Exclusive Lock (X) allows:",
+      "option_a": "Multiple reads",
+      "option_b": "Multiple writes",
+      "option_c": "Only one transaction to read/write",
+      "option_d": "No access",
+      "correct_option": "C",
+      "explanation": "Exclusive lock: only the holding transaction can access.",
+      "points": 1,
+      "sort_order": 4
+    },
+    {
+      "id": "3a0725f1-ada5-40d5-bea9-bdb1ed2b7fa6",
+      "quiz_id": "6f6d8143-e36e-4c96-b0d1-115a7265b640",
+      "question_text": "What is a deadlock?",
+      "option_a": "Slow query",
+      "option_b": "Database crash",
+      "option_c": "Transactions waiting for each other",
+      "option_d": "Data corruption",
+      "correct_option": "C",
+      "explanation": "Deadlock: transactions waiting for each other indefinitely.",
+      "points": 1,
+      "sort_order": 5
+    },
+    {
+      "id": "e2569032-b149-4673-a4cf-9f07fba0d225",
+      "quiz_id": "6f6d8143-e36e-4c96-b0d1-115a7265b640",
+      "question_text": "Two-Phase Locking phases:",
+      "option_a": "Read and Write",
+      "option_b": "Growing and Shrinking",
+      "option_c": "Lock and Unlock",
+      "option_d": "Commit and Rollback",
+      "correct_option": "B",
+      "explanation": "2PL: Growing (acquire locks) and Shrinking (release locks).",
+      "points": 1,
+      "sort_order": 6
+    },
+    {
+      "id": "331984ba-fc9d-404e-8c4b-e377515fc13e",
+      "quiz_id": "6f6d8143-e36e-4c96-b0d1-115a7265b640",
+      "question_text": "Write-Ahead Logging (WAL) ensures:",
+      "option_a": "Atomicity",
+      "option_b": "Isolation",
+      "option_c": "Durability",
+      "option_d": "Consistency",
+      "correct_option": "C",
+      "explanation": "WAL ensures durability by writing logs before data changes.",
+      "points": 1,
+      "sort_order": 7
+    },
+    {
+      "id": "b4e5f265-a296-4889-ad0d-261fee1e5d15",
+      "quiz_id": "6f6d8143-e36e-4c96-b0d1-115a7265b640",
+      "question_text": "In Wait-Die, a younger transaction:",
+      "option_a": "Waits",
+      "option_b": "Dies (aborts)",
+      "option_c": "Continues",
+      "option_d": "Restarts",
+      "correct_option": "B",
+      "explanation": "Wait-Die: younger transaction aborts if needing a lock from older.",
+      "points": 1,
+      "sort_order": 8
+    },
+    {
+      "id": "818b8d94-face-43fa-8ea1-cd8019347c8c",
+      "quiz_id": "6708e7a5-b312-4a77-8784-241c3d91039a",
+      "question_text": "A university database has: Student(SID, Name, DeptID), Department(DeptID, DeptName, HOD_ID), Faculty(FID, Name). The functional dependencies are: SID→Name,DeptID; DeptID→DeptName,HOD_ID; FID→Name. The Student table is in which normal form?",
+      "option_a": "1NF — because it has repeating groups",
+      "option_b": "2NF — because all non-key attributes depend on the full primary key",
+      "option_c": "3NF — because there are no transitive dependencies in Student",
+      "option_d": "BCNF — because every determinant is a superkey",
+      "correct_option": "C",
+      "explanation": "Student(SID→Name,DeptID) has SID as the only candidate key. Name and DeptID both depend directly on SID with no transitive dependency within this table. DeptID→DeptName,HOD_ID is a dependency in the Department table, not Student. So Student is in 3NF.",
+      "points": 2,
+      "sort_order": 1
+    },
+    {
+      "id": "aa3a6f92-a95b-4715-8932-a2f1741a7ef5",
+      "quiz_id": "6708e7a5-b312-4a77-8784-241c3d91039a",
+      "question_text": "Consider two transactions: T1 reads A, writes A, reads B, writes B. T2 reads A, reads B, writes B. Schedule: T1:R(A), T2:R(A), T1:W(A), T2:R(B), T1:R(B), T1:W(B), T2:W(B). Is this schedule conflict-serializable?",
+      "option_a": "Yes, it is equivalent to T1→T2",
+      "option_b": "Yes, it is equivalent to T2→T1",
+      "option_c": "No, because the precedence graph has a cycle",
+      "option_d": "Cannot be determined without knowing the values",
+      "correct_option": "C",
+      "explanation": "Build precedence graph: T1:R(A) before T2:R(A) — no conflict (both reads). T2:R(A) before T1:W(A) — conflict: T2→T1. T1:R(B) before T2:W(B) — conflict: T1→T2. This creates a cycle T1→T2→T1, so NOT conflict-serializable.",
+      "points": 2,
+      "sort_order": 2
+    },
+    {
+      "id": "cb197d4e-656b-4674-b0f4-01646c06e0af",
+      "quiz_id": "6708e7a5-b312-4a77-8784-241c3d91039a",
+      "question_text": "A B+ tree of order 4 (max 3 keys per node) contains values 1-15 inserted in order. After deleting keys 5, 7, and 11, what is the minimum height of the resulting tree?",
+      "option_a": "1 (just root with children)",
+      "option_b": "2 (root, one level of internal nodes, leaves)",
+      "option_c": "3 (three levels)",
+      "option_d": "0 (all data fits in root)",
+      "correct_option": "B",
+      "explanation": "With 12 remaining values in a B+ tree of order 4, each leaf can hold 2-3 keys. Minimum leaves needed = ceil(12/3) = 4 leaves. An internal node can hold 2-4 children. 4 leaves need at least 2 internal nodes under a root, giving height = 2.",
+      "points": 1,
+      "sort_order": 3
+    },
+    {
+      "id": "d3097def-8622-4639-9ad8-6b4e0092ff43",
+      "quiz_id": "6708e7a5-b312-4a77-8784-241c3d91039a",
+      "question_text": "Given relation R(A,B,C,D,E) with FDs: A→BC, CD→E, B→D, E→A. What are all the candidate keys?",
+      "option_a": "A only",
+      "option_b": "A and E",
+      "option_c": "A, E, BC, and CD",
+      "option_d": "A, E, and CD",
+      "correct_option": "C",
+      "explanation": "A→BC→D(via B→D), and CD→E, so A→ABCDE (A is a candidate key). E→A→ABCDE (E is a candidate key). BC: B→D, so BC→BCD, CD→E, so BC→BCDE, E→A, so BC→ABCDE. CD: CD→E→A→BC, so CD→ABCDE. All four are candidate keys.",
+      "points": 2,
+      "sort_order": 4
+    },
+    {
+      "id": "c79ff371-2e22-420e-abfd-34de836448cf",
+      "quiz_id": "6708e7a5-b312-4a77-8784-241c3d91039a",
+      "question_text": "In a distributed database, a transaction T needs to update records on servers S1, S2, and S3. During 2-Phase Commit, S1 votes YES, S2 votes YES, but S3 crashes before voting. What should the coordinator do?",
+      "option_a": "Commit the transaction on S1 and S2, abort on S3",
+      "option_b": "Wait indefinitely for S3 to recover and vote",
+      "option_c": "Abort the entire transaction (global abort)",
+      "option_d": "Commit because majority voted YES",
+      "correct_option": "C",
+      "explanation": "In 2PC, ALL participants must vote YES for a commit. If any participant fails to vote (or votes NO), the coordinator must issue a global ABORT. 2PC requires unanimity, not majority.",
+      "points": 1,
+      "sort_order": 5
+    },
+    {
+      "id": "5d982f05-4279-4893-b8f8-efbe488d355a",
+      "quiz_id": "6708e7a5-b312-4a77-8784-241c3d91039a",
+      "question_text": "A query \"SELECT * FROM Employees WHERE salary > 50000 AND department = 'CS' ORDER BY name\" runs on a table with 100,000 rows. An index exists on (department, salary). Which optimization would the query optimizer most likely choose?",
+      "option_a": "Full table scan with filesort",
+      "option_b": "Use the composite index for department=\"CS\", then filter salary, then filesort for name",
+      "option_c": "Use the index for salary > 50000 only",
+      "option_d": "Create a temporary index on name, then scan",
+      "correct_option": "B",
+      "explanation": "The composite index (department, salary) can be used to efficiently find department=\"CS\" rows (first column match), then the index can further narrow by salary > 50000 (range on second column). The ORDER BY name would require a filesort since name is not in the index. This is the most efficient plan.",
+      "points": 1,
+      "sort_order": 6
+    },
+    {
+      "id": "25b53e30-7f52-4f50-bc5a-30a7f5da7ccb",
+      "quiz_id": "6708e7a5-b312-4a77-8784-241c3d91039a",
+      "question_text": "A table OrderDetails(OrderID, ProductID, Qty, Price, Total) has Total = Qty × Price. Which anomaly does storing Total introduce, and what is the best fix?",
+      "option_a": "Insertion anomaly — add a CHECK constraint",
+      "option_b": "Update anomaly — use a computed/generated column or view",
+      "option_c": "Deletion anomaly — add a trigger",
+      "option_d": "No anomaly — storing derived data is always fine",
+      "correct_option": "B",
+      "explanation": "Total is a derived attribute (Qty × Price). Storing it creates an UPDATE anomaly: if Qty or Price changes, Total must also be updated or it becomes inconsistent. The best fix is to use a computed column (generated as Qty*Price) or a view, so Total is always calculated, never stored.",
+      "points": 1,
+      "sort_order": 7
+    },
+    {
+      "id": "2bb4b872-4ead-4d4d-980e-c1f3af04bb73",
+      "quiz_id": "6708e7a5-b312-4a77-8784-241c3d91039a",
+      "question_text": "Two transactions execute under Strict 2PL: T1 holds X-lock on record R1 and requests S-lock on R2. T2 holds X-lock on R2 and requests S-lock on R1. What happens?",
+      "option_a": "Both transactions proceed normally",
+      "option_b": "Deadlock occurs — one transaction must be rolled back",
+      "option_c": "T1 proceeds, T2 waits",
+      "option_d": "Both requests are converted to X-locks",
+      "correct_option": "B",
+      "explanation": "T1 holds X(R1), wants S(R2) — but T2 holds X(R2), so T1 must wait. T2 holds X(R2), wants S(R1) — but T1 holds X(R1), so T2 must wait. Circular wait = deadlock. The DBMS deadlock detector must abort one transaction.",
+      "points": 2,
+      "sort_order": 8
+    },
+    {
+      "id": "2fa86e52-d021-4398-9570-a51fea7aa14d",
+      "quiz_id": "68a0660c-d050-41a0-9646-c6a9418ea397",
+      "question_text": "Given: Employees(EID, Name, DeptID, Salary, MgrID). Write the correct query to find departments where the average salary exceeds the company-wide average salary. Which query is correct?",
+      "option_a": "SELECT DeptID FROM Employees GROUP BY DeptID HAVING AVG(Salary) > AVG(Salary)",
+      "option_b": "SELECT DeptID FROM Employees GROUP BY DeptID HAVING AVG(Salary) > (SELECT AVG(Salary) FROM Employees)",
+      "option_c": "SELECT DeptID FROM Employees WHERE AVG(Salary) > (SELECT AVG(Salary) FROM Employees)",
+      "option_d": "SELECT DeptID, AVG(Salary) FROM Employees HAVING AVG(Salary) > ALL(SELECT AVG(Salary) FROM Employees)",
+      "correct_option": "B",
+      "explanation": "Option B correctly uses a correlated subquery in HAVING. Option A compares AVG with itself (always false). Option C uses AVG in WHERE (not allowed). Option D has syntax issues with GROUP BY missing.",
+      "points": 1,
+      "sort_order": 1
+    },
+    {
+      "id": "fccefdbf-50f1-4bc4-861d-1d50da9a7e85",
+      "quiz_id": "68a0660c-d050-41a0-9646-c6a9418ea397",
+      "question_text": "What is the output of: SELECT COUNT(*), COUNT(commission) FROM employees; if the table has 10 rows and 3 rows have NULL commission?",
+      "option_a": "10, 10",
+      "option_b": "10, 7",
+      "option_c": "7, 7",
+      "option_d": "10, 3",
+      "correct_option": "B",
+      "explanation": "COUNT(*) counts ALL rows including NULLs = 10. COUNT(commission) counts only non-NULL values = 10-3 = 7. This is a key distinction in SQL aggregate functions.",
+      "points": 1,
+      "sort_order": 2
+    },
+    {
+      "id": "41ff0de5-ed94-426f-a715-90d55e511c85",
+      "quiz_id": "68a0660c-d050-41a0-9646-c6a9418ea397",
+      "question_text": "To find employees who earn more than EVERY employee in department 10, which operator should be used?",
+      "option_a": "salary > ANY (SELECT salary FROM emp WHERE dept=10)",
+      "option_b": "salary > ALL (SELECT salary FROM emp WHERE dept=10)",
+      "option_c": "salary > SOME (SELECT salary FROM emp WHERE dept=10)",
+      "option_d": "salary IN (SELECT MAX(salary) FROM emp WHERE dept=10)",
+      "correct_option": "B",
+      "explanation": "> ALL means greater than the maximum value in the subquery result. > ANY/SOME means greater than at least one (the minimum). To beat EVERY employee in dept 10, we need > ALL.",
+      "points": 1,
+      "sort_order": 3
+    },
+    {
+      "id": "4092f450-9e2e-4847-806e-a68ca185dcbf",
+      "quiz_id": "68a0660c-d050-41a0-9646-c6a9418ea397",
+      "question_text": "What does this query return? SELECT e1.Name FROM Employees e1 WHERE NOT EXISTS (SELECT 1 FROM Projects p WHERE NOT EXISTS (SELECT 1 FROM Works_On w WHERE w.EID = e1.EID AND w.PID = p.PID))",
+      "option_a": "Employees who work on at least one project",
+      "option_b": "Employees who work on no projects",
+      "option_c": "Employees who work on ALL projects (division)",
+      "option_d": "All employees regardless of projects",
+      "correct_option": "C",
+      "explanation": "This is the relational division pattern in SQL. Double NOT EXISTS reads as: \"find employees where there is NO project that they do NOT work on\" = employees who work on ALL projects.",
+      "points": 2,
+      "sort_order": 4
+    },
+    {
+      "id": "201c2664-97e6-4727-b424-c959a970b47f",
+      "quiz_id": "68a0660c-d050-41a0-9646-c6a9418ea397",
+      "question_text": "Given a self-join query: SELECT e.Name AS Employee, m.Name AS Manager FROM Employees e LEFT JOIN Employees m ON e.MgrID = m.EID; — What does LEFT JOIN ensure here?",
+      "option_a": "Only employees with managers are shown",
+      "option_b": "All employees are shown, even those without a manager (CEO)",
+      "option_c": "All managers are shown even if they have no reports",
+      "option_d": "Duplicate rows are added for each manager",
+      "correct_option": "B",
+      "explanation": "LEFT JOIN ensures ALL rows from the left table (employees) are included. If an employee has no matching MgrID (like a CEO), they still appear with NULL in the Manager column.",
+      "points": 1,
+      "sort_order": 5
+    },
+    {
+      "id": "72347820-4a25-407d-b7e2-44e0fbc855f7",
+      "quiz_id": "68a0660c-d050-41a0-9646-c6a9418ea397",
+      "question_text": "Which of these prevents SQL injection most effectively?",
+      "option_a": "Escaping single quotes in user input",
+      "option_b": "Using parameterized/prepared statements",
+      "option_c": "Validating input length",
+      "option_d": "Using LIMIT 1 in queries",
+      "correct_option": "B",
+      "explanation": "Parameterized/prepared statements separate SQL code from data, making injection impossible. Escaping quotes can be bypassed. Input validation and LIMIT don't prevent injection at the root cause.",
+      "points": 1,
+      "sort_order": 6
+    },
+    {
+      "id": "258d2dcf-9d1f-41eb-b177-600489fbfc05",
+      "quiz_id": "68a0660c-d050-41a0-9646-c6a9418ea397",
+      "question_text": "A query runs: SELECT dept, salary, RANK() OVER (PARTITION BY dept ORDER BY salary DESC) as rnk FROM employees; — What does RANK() return for two employees with the same highest salary in a department?",
+      "option_a": "Both get rank 1, next gets rank 2",
+      "option_b": "Both get rank 1, next gets rank 3",
+      "option_c": "First gets rank 1, second gets rank 2",
+      "option_d": "Both get rank 0",
+      "correct_option": "B",
+      "explanation": "RANK() assigns the same rank for ties and SKIPS the next rank(s). Two employees tied at rank 1, so the next employee gets rank 3 (not 2). DENSE_RANK() would give rank 2 instead.",
+      "points": 1,
+      "sort_order": 7
+    },
+    {
+      "id": "b0b99dd5-02a4-438b-ae2e-0945b814437a",
+      "quiz_id": "68a0660c-d050-41a0-9646-c6a9418ea397",
+      "question_text": "What is wrong with this query? DELETE FROM orders WHERE order_date < \"2024-01-01\" AND customer_id IN (SELECT customer_id FROM orders WHERE total > 1000)",
+      "option_a": "Cannot use subquery in DELETE",
+      "option_b": "The subquery references the same table being deleted (may cause issues in MySQL)",
+      "option_c": "AND cannot combine with IN",
+      "option_d": "Nothing is wrong",
+      "correct_option": "B",
+      "explanation": "In MySQL, you cannot modify a table and select from the same table in a subquery within the same statement. This throws an error. Solution: use a derived table/CTE, or a temporary table. PostgreSQL handles this correctly though.",
+      "points": 2,
+      "sort_order": 8
+    }
+  ],
+  "quiz_attempts": [
+    {
+      "id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "student_id": "fc0001ad-853e-4a4f-8b8c-b65e8ef10432",
+      "started_at": "2026-04-10T10:00:00Z",
+      "completed_at": "2026-04-10T10:07:30Z",
+      "score": 8,
+      "total_points": 10,
+      "time_taken_seconds": 450,
+      "status": "completed"
+    },
+    {
+      "id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "quiz_id": "c032f310-b0da-4f63-a404-39d6042a6f7b",
+      "student_id": "b0196de1-112c-46db-9487-1a2441336d80",
+      "started_at": "2026-04-10T11:00:00Z",
+      "completed_at": "2026-04-10T11:06:00Z",
+      "score": 9,
+      "total_points": 10,
+      "time_taken_seconds": 360,
+      "status": "completed"
+    },
+    {
+      "id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "quiz_id": "ec7061a8-509d-4dde-adbc-cbbd11740a91",
+      "student_id": "fc0001ad-853e-4a4f-8b8c-b65e8ef10432",
+      "started_at": "2026-04-11T14:00:00Z",
+      "completed_at": "2026-04-11T14:10:00Z",
+      "score": 7,
+      "total_points": 10,
+      "time_taken_seconds": 600,
+      "status": "completed"
+    }
+  ],
+  "answers": [
+    {
+      "id": "6ec57d1f-5213-4af2-b1cf-9f2b7d735df6",
+      "attempt_id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "question_id": "e6a660b4-c338-422c-a23e-5b7d5cb4845c",
+      "selected_option": "B",
+      "is_correct": 1
+    },
+    {
+      "id": "037c11ad-fcb0-419d-b829-5acbe67dff06",
+      "attempt_id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "question_id": "d50903b4-a3b1-43ba-ba17-4f952b6d3a25",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "9a1e0ef4-2164-4fc4-a9fa-18cf273c9435",
+      "attempt_id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "question_id": "46e25144-d0ba-4062-838c-30ceb0fb8ccd",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "1e99d7d6-a2b4-4c6a-a9e7-641ab1dc0f08",
+      "attempt_id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "question_id": "63fdfde9-6cab-4d88-acb9-fe7cc916226a",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "abc9d6e2-fc25-46e3-a37c-2deea1e5f45d",
+      "attempt_id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "question_id": "183c4635-dd16-4bab-b71f-9b9a1bead94d",
+      "selected_option": "D",
+      "is_correct": 1
+    },
+    {
+      "id": "5471ef8d-5ed0-4d40-9e76-12cc49dee4db",
+      "attempt_id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "question_id": "8a257dc2-4c33-45c6-8288-2455b958f0ad",
+      "selected_option": "B",
+      "is_correct": 1
+    },
+    {
+      "id": "bc02221b-d2c3-4ee0-b2d6-331f23cd1794",
+      "attempt_id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "question_id": "c5fc5f59-278b-4093-a147-1ec3a86f61b0",
+      "selected_option": "B",
+      "is_correct": 1
+    },
+    {
+      "id": "834727c8-830c-4af1-af4f-20ce0a25015d",
+      "attempt_id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "question_id": "5d922bd1-9699-4e2d-8577-38cad494496b",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "c41befbf-1769-4717-b6fb-5b7b6cc21bb6",
+      "attempt_id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "question_id": "d2a23c94-3573-49f9-a98c-60a2d50c7242",
+      "selected_option": "B",
+      "is_correct": 1
+    },
+    {
+      "id": "5bd184e8-e957-4eb0-8f5c-7e8146d09c35",
+      "attempt_id": "45373812-4d20-4d5f-a5e5-f93d87f0d97e",
+      "question_id": "115142b0-4d9c-433f-b50d-c628d8d64729",
+      "selected_option": "D",
+      "is_correct": 1
+    },
+    {
+      "id": "cf53edcc-40a1-4305-8789-2f7466cad5e2",
+      "attempt_id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "question_id": "e6a660b4-c338-422c-a23e-5b7d5cb4845c",
+      "selected_option": "B",
+      "is_correct": 1
+    },
+    {
+      "id": "b9bb0410-febd-4d93-9f4d-b4ea76ee55ba",
+      "attempt_id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "question_id": "d50903b4-a3b1-43ba-ba17-4f952b6d3a25",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "393fd0f2-1828-44cc-a2ab-e6af40dd6ed8",
+      "attempt_id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "question_id": "46e25144-d0ba-4062-838c-30ceb0fb8ccd",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "f3560f0b-84e4-45bc-a500-a029288a4736",
+      "attempt_id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "question_id": "63fdfde9-6cab-4d88-acb9-fe7cc916226a",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "ec8d85cc-f0ff-4655-828f-134d9b26adab",
+      "attempt_id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "question_id": "183c4635-dd16-4bab-b71f-9b9a1bead94d",
+      "selected_option": "D",
+      "is_correct": 1
+    },
+    {
+      "id": "a299b1c4-43c7-4ef8-9c99-b2f4ab20d340",
+      "attempt_id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "question_id": "8a257dc2-4c33-45c6-8288-2455b958f0ad",
+      "selected_option": "B",
+      "is_correct": 1
+    },
+    {
+      "id": "e3beac61-b76c-4256-8891-6ab667a4d336",
+      "attempt_id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "question_id": "c5fc5f59-278b-4093-a147-1ec3a86f61b0",
+      "selected_option": "B",
+      "is_correct": 1
+    },
+    {
+      "id": "1986e041-c3b5-47fa-accb-bfee4dfbee50",
+      "attempt_id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "question_id": "5d922bd1-9699-4e2d-8577-38cad494496b",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "dd89ba9f-b217-4a3b-8ffb-c1a9989ab2cf",
+      "attempt_id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "question_id": "d2a23c94-3573-49f9-a98c-60a2d50c7242",
+      "selected_option": "B",
+      "is_correct": 1
+    },
+    {
+      "id": "2c6063bc-fee4-4f6d-a73a-0996715e9e79",
+      "attempt_id": "b5a61878-e66a-4ad7-8b3b-a12e101dc929",
+      "question_id": "115142b0-4d9c-433f-b50d-c628d8d64729",
+      "selected_option": "D",
+      "is_correct": 1
+    },
+    {
+      "id": "1aa3cc4a-788f-4aa9-a056-a9044fa77b91",
+      "attempt_id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "question_id": "59580dc5-6551-44fb-a1ac-9d8b93575b8a",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "1c3e738f-04fd-4f1e-b6ae-963c71b36b0a",
+      "attempt_id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "question_id": "0c5c9002-2824-4e5d-a4a8-389003708e15",
+      "selected_option": "B",
+      "is_correct": 1
+    },
+    {
+      "id": "2ec6e519-31ba-4a5c-b07c-41a64d9ef255",
+      "attempt_id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "question_id": "cb49395e-794e-4faf-bc63-9eb051289bdc",
+      "selected_option": "A",
+      "is_correct": 1
+    },
+    {
+      "id": "f69a1d05-052e-4f42-b802-63cd82d2fdf3",
+      "attempt_id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "question_id": "97db5378-21a9-46e5-bca3-19208ba23ca0",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "98fabff8-47a8-4d5f-a1c8-413c4258b2d6",
+      "attempt_id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "question_id": "5e2d9202-ab8d-4c64-ba93-eec67397b47d",
+      "selected_option": "D",
+      "is_correct": 1
+    },
+    {
+      "id": "0abbbf27-c336-4af0-8ace-00fa323ecadf",
+      "attempt_id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "question_id": "17fe19c2-7850-4afa-9271-cb1849269cff",
+      "selected_option": "B",
+      "is_correct": 1
+    },
+    {
+      "id": "19fc0784-8ad7-4fc0-ac4b-ca62016a63e4",
+      "attempt_id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "question_id": "b4b0df45-43da-4516-b552-603630a1b49e",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "a3de78d8-e0ef-4ee4-aa4b-6040694ca838",
+      "attempt_id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "question_id": "1fe8e6e4-beaf-4f5d-b0e5-7c48f03d2788",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "e40b80ea-28f4-40ff-857a-135967e3b463",
+      "attempt_id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "question_id": "e88a5c1a-2665-487d-988a-d73e8b398bfa",
+      "selected_option": "C",
+      "is_correct": 1
+    },
+    {
+      "id": "14098174-6814-4858-9e6d-2d0f1f93884c",
+      "attempt_id": "d5f64868-9f6b-41e1-9aa9-599a575d568a",
+      "question_id": "d590785a-54dc-4ea0-bd97-31e5c6bbfe7c",
+      "selected_option": "B",
+      "is_correct": 1
+    }
+  ],
+  "materials": [
+    {
+      "id": "12fb627b-0960-4e24-9db9-ebd7433b1b87",
+      "title": "DBMS Complete Course — Introduction",
+      "description": "Full introduction to DBMS covering architecture, data models, and schema design. Perfect for beginners starting the DBMS journey.",
+      "type": "video",
+      "url": "https://www.youtube.com/embed/kBdlM6hNDAE",
+      "module_id": "b0754b49-593a-40da-ba4c-9a463a33efff",
+      "thumbnail": "https://img.youtube.com/vi/kBdlM6hNDAE/maxresdefault.jpg",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "deb98324-ae6c-49a0-ac8f-1fbdff47010f",
+      "title": "ER Diagram Tutorial — Complete Guide",
+      "description": "Step-by-step tutorial on creating Entity-Relationship diagrams with real-world examples. Covers entities, attributes, relationships, and cardinality.",
+      "type": "video",
+      "url": "https://www.youtube.com/embed/QpdhBUYk7Kk",
+      "module_id": "82910a96-074d-4059-b2f9-596dd466b99d",
+      "thumbnail": "https://img.youtube.com/vi/QpdhBUYk7Kk/maxresdefault.jpg",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "49cbe546-de3c-4a80-bb27-f55f75c8623d",
+      "title": "Database Normalization — 1NF, 2NF, 3NF, BCNF",
+      "description": "Clear explanation of all normal forms with practical table decomposition examples. Includes anomaly identification and resolution.",
+      "type": "video",
+      "url": "https://www.youtube.com/embed/GFQaEYEc8_8",
+      "module_id": "facbcb9e-3f7a-4e4e-8cba-1f80f0c2b4b0",
+      "thumbnail": "https://img.youtube.com/vi/GFQaEYEc8_8/maxresdefault.jpg",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "e34f444f-152f-4e96-b448-acff6fe3d0e0",
+      "title": "SQL Full Course for Beginners",
+      "description": "Comprehensive SQL tutorial covering SELECT, JOIN, GROUP BY, subqueries, and advanced functions with hands-on examples.",
+      "type": "video",
+      "url": "https://www.youtube.com/embed/HXV3zeQKqGY",
+      "module_id": "bc0bc089-25a5-4c9c-9aec-05078b2cb778",
+      "thumbnail": "https://img.youtube.com/vi/HXV3zeQKqGY/maxresdefault.jpg",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "919c0a18-2e42-4227-8f19-6160e672e263",
+      "title": "Transactions & Concurrency Control in DBMS",
+      "description": "Detailed lecture on ACID properties, serializability, locking protocols, deadlock detection and recovery mechanisms.",
+      "type": "video",
+      "url": "https://www.youtube.com/embed/P80Js_qClUE",
+      "module_id": "74253705-7ad5-4fce-8902-070b48e5d1e9",
+      "thumbnail": "https://img.youtube.com/vi/P80Js_qClUE/maxresdefault.jpg",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "ef12a6d2-acc0-4982-8a8d-0aeec76e3e25",
+      "title": "Indexing and B+ Trees Explained",
+      "description": "Visual explanation of indexing data structures including B-Trees, B+ Trees, hash indexes and their performance characteristics.",
+      "type": "video",
+      "url": "https://www.youtube.com/embed/aZjYr87r1b8",
+      "module_id": "8baf582a-0905-4245-8144-fe622478c455",
+      "thumbnail": "https://img.youtube.com/vi/aZjYr87r1b8/maxresdefault.jpg",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "1c21fc30-b172-4718-82e1-c2373fe3006c",
+      "title": "Relational Algebra — Complete Lecture",
+      "description": "Covers all relational algebra operations: selection, projection, union, intersection, difference, join, and division with examples.",
+      "type": "video",
+      "url": "https://www.youtube.com/embed/jMVRz55CqOY",
+      "module_id": null,
+      "thumbnail": "https://img.youtube.com/vi/jMVRz55CqOY/maxresdefault.jpg",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "4eda038c-8bcd-4d3c-943f-7e6e5d521b01",
+      "title": "SQL Joins Visualized — Inner, Left, Right, Full",
+      "description": "Visual diagrams and animated examples of all SQL JOIN types. Includes self-joins and cross joins with real-world scenarios.",
+      "type": "video",
+      "url": "https://www.youtube.com/embed/9yeOJ0ZMUYw",
+      "module_id": "bc0bc089-25a5-4c9c-9aec-05078b2cb778",
+      "thumbnail": "https://img.youtube.com/vi/9yeOJ0ZMUYw/maxresdefault.jpg",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "10e4225a-fa84-4074-b495-1ef029f43714",
+      "title": "Introduction to DBMS — Lecture Slides",
+      "description": "Comprehensive lecture slides covering DBMS fundamentals, architecture, data models, schema, and three-schema architecture.",
+      "type": "ppt",
+      "url": "#",
+      "module_id": "b0754b49-593a-40da-ba4c-9a463a33efff",
+      "thumbnail": null,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z",
+      "slides": [
+        {
+          "title": "Introduction to DBMS",
+          "subtitle": "Database Management Systems — Fundamentals",
+          "layout": "cover",
+          "color": "#7C4DFF"
+        },
+        {
+          "title": "What is a Database?",
+          "bullets": [
+            "An organized collection of structured data stored electronically",
+            "Managed by a Database Management System (DBMS)",
+            "Enables efficient storage, retrieval, and manipulation of data",
+            "Examples: Student records, banking systems, e-commerce catalogs"
+          ],
+          "icon": "🗄️"
+        },
+        {
+          "title": "What is a DBMS?",
+          "bullets": [
+            "Software system for creating and managing databases",
+            "Acts as an interface between users and the database",
+            "Provides data abstraction, security, and integrity",
+            "Examples: MySQL, PostgreSQL, Oracle, MongoDB, SQL Server"
+          ],
+          "icon": "⚙️"
+        },
+        {
+          "title": "Types of DBMS",
+          "bullets": [
+            "🏗️ Hierarchical DBMS — Tree-like structure (IBM IMS)",
+            "🕸️ Network DBMS — Graph with many-to-many relationships",
+            "📊 Relational DBMS — Tables with rows and columns (most popular)",
+            "📦 Object-Oriented DBMS — Data stored as objects",
+            "🍃 NoSQL DBMS — Flexible schemas for unstructured data"
+          ],
+          "icon": "📋"
+        },
+        {
+          "title": "Three-Schema Architecture",
+          "bullets": [
+            "External Level — User views (how users see data)",
+            "Conceptual Level — Logical structure (what data is stored)",
+            "Internal Level — Physical storage (how data is stored on disk)",
+            "✅ Provides data independence and abstraction"
+          ],
+          "icon": "🏛️"
+        },
+        {
+          "title": "File System vs DBMS",
+          "table": {
+            "headers": [
+              "Feature",
+              "File System",
+              "DBMS"
+            ],
+            "rows": [
+              [
+                "Data Redundancy",
+                "❌ High",
+                "✅ Controlled"
+              ],
+              [
+                "Data Consistency",
+                "❌ Difficult",
+                "✅ Enforced"
+              ],
+              [
+                "Concurrent Access",
+                "❌ Limited",
+                "✅ Supported"
+              ],
+              [
+                "Security",
+                "❌ Basic",
+                "✅ Advanced"
+              ],
+              [
+                "Backup & Recovery",
+                "❌ Manual",
+                "✅ Automatic"
+              ],
+              [
+                "Data Integrity",
+                "❌ No constraints",
+                "✅ Constraints enforced"
+              ]
+            ]
+          }
+        },
+        {
+          "title": "ACID Properties",
+          "bullets": [
+            "⚛️ Atomicity — All or nothing, transactions complete fully or not at all",
+            "🔄 Consistency — Database moves from one valid state to another",
+            "🔒 Isolation — Concurrent transactions don't interfere",
+            "💾 Durability — Committed changes survive system failures"
+          ],
+          "icon": "🛡️"
+        },
+        {
+          "title": "Key Takeaways",
+          "bullets": [
+            "DBMS provides structured, efficient data management",
+            "Three-schema architecture ensures data independence",
+            "ACID properties guarantee transaction reliability",
+            "RDBMS (relational) is the most widely used model",
+            "DBMS is essential for any modern application"
+          ],
+          "layout": "summary",
+          "icon": "🎯"
+        }
+      ]
+    },
+    {
+      "id": "18af18f0-a2c5-48b6-bace-ea6772df850b",
+      "title": "ER Model & ER Diagrams",
+      "description": "Detailed slides on Entity-Relationship model, Chen notation, weak entities, attributes, relationships, and participation constraints.",
+      "type": "ppt",
+      "url": "#",
+      "module_id": "82910a96-074d-4059-b2f9-596dd466b99d",
+      "thumbnail": null,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z",
+      "slides": [
+        {
+          "title": "Entity-Relationship Model",
+          "subtitle": "Data Modeling with ER Diagrams",
+          "layout": "cover",
+          "color": "#10b981"
+        },
+        {
+          "title": "What is an ER Diagram?",
+          "bullets": [
+            "A visual representation of entities and their relationships",
+            "Used in the conceptual design phase of database development",
+            "Proposed by Peter Chen in 1976",
+            "Translated into relational schema for implementation"
+          ],
+          "icon": "📊"
+        },
+        {
+          "title": "Entities",
+          "bullets": [
+            "🔲 Entity — A real-world object (Student, Course, Employee)",
+            "🔲 Strong Entity — Can be uniquely identified by its own attributes",
+            "🔲🔲 Weak Entity — Depends on a strong entity for identification",
+            "Entity Set — Collection of similar entities",
+            "Represented as rectangles in ER diagrams"
+          ],
+          "icon": "📦"
+        },
+        {
+          "title": "Attributes",
+          "bullets": [
+            "⬭ Simple — Cannot be divided (e.g., Age, Salary)",
+            "⬭ Composite — Divisible (e.g., Name → First + Last)",
+            "⬭ Derived — Calculated from others (e.g., Age from DOB) — shown with dashed ellipse",
+            "⬭ Multi-valued — Multiple values (e.g., Phone Numbers) — shown with double ellipse",
+            "🔑 Key Attribute — Uniquely identifies entity — shown with underlined text"
+          ],
+          "icon": "📝"
+        },
+        {
+          "title": "Relationships",
+          "bullets": [
+            "◇ Relationship — Association between entities",
+            "1:1 — One-to-One (Person ↔ Passport)",
+            "1:N — One-to-Many (Department ↔ Employees)",
+            "M:N — Many-to-Many (Students ↔ Courses)",
+            "Represented as diamonds connecting entities"
+          ],
+          "icon": "🔗"
+        },
+        {
+          "title": "Cardinality & Participation",
+          "bullets": [
+            "Cardinality — Maximum number of relationship instances (1:1, 1:N, M:N)",
+            "Total Participation — Every entity MUST participate (double line ═══)",
+            "Partial Participation — Some entities may not participate (single line ———)",
+            "Example: Every Employee MUST belong to a Department (total)",
+            "Some Employees MAY manage a Department (partial)"
+          ],
+          "icon": "📐"
+        },
+        {
+          "title": "ER → Relational Mapping",
+          "bullets": [
+            "Strong entity → Table with all simple attributes",
+            "Weak entity → Table with foreign key to owner entity",
+            "1:1 Relationship → Add FK to either entity table",
+            "1:N Relationship → Add FK to the \"many\" side table",
+            "M:N Relationship → Create a new junction/bridge table",
+            "Multi-valued attribute → Separate table with FK"
+          ],
+          "icon": "🗃️"
+        },
+        {
+          "title": "Summary",
+          "bullets": [
+            "ER diagrams model real-world data relationships visually",
+            "Entities = nouns, Relationships = verbs, Attributes = properties",
+            "Cardinality defines how many entities participate",
+            "Participation constraints define mandatory vs optional",
+            "ER diagrams are mapped to relational tables for implementation"
+          ],
+          "layout": "summary",
+          "icon": "🎯"
+        }
+      ]
+    },
+    {
+      "id": "43fec907-15b1-4d8f-abbf-f11dc56857fd",
+      "title": "Normalization in DBMS",
+      "description": "Lecture slides on normalization: functional dependencies, 1NF through BCNF, decomposition algorithms, and lossless joins.",
+      "type": "ppt",
+      "url": "#",
+      "module_id": "facbcb9e-3f7a-4e4e-8cba-1f80f0c2b4b0",
+      "thumbnail": null,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z",
+      "slides": [
+        {
+          "title": "Database Normalization",
+          "subtitle": "Eliminating Redundancy & Anomalies",
+          "layout": "cover",
+          "color": "#f59e0b"
+        },
+        {
+          "title": "Why Normalize?",
+          "bullets": [
+            "❌ Insertion Anomaly — Cannot add data without other data",
+            "❌ Update Anomaly — Changing one fact requires multiple row updates",
+            "❌ Deletion Anomaly — Deleting data unintentionally removes other data",
+            "✅ Normalization eliminates these anomalies systematically",
+            "✅ Reduces data redundancy and improves integrity"
+          ],
+          "icon": "🎯"
+        },
+        {
+          "title": "Functional Dependencies",
+          "bullets": [
+            "X → Y means: value of X uniquely determines value of Y",
+            "Example: StudentID → StudentName (one ID = one name)",
+            "Trivial FD: X → Y where Y ⊆ X",
+            "Closure of FDs: all dependencies derivable from a set",
+            "Armstrong's Axioms: Reflexivity, Augmentation, Transitivity"
+          ],
+          "icon": "🔗"
+        },
+        {
+          "title": "First Normal Form (1NF)",
+          "bullets": [
+            "✅ All attributes must contain atomic (indivisible) values",
+            "✅ No repeating groups or arrays in a single cell",
+            "✅ Each row must be uniquely identifiable",
+            "❌ Violation: Student(Name, Phones: \"123,456,789\")",
+            "✅ Fix: Create separate rows or a Phone table"
+          ],
+          "icon": "1️⃣"
+        },
+        {
+          "title": "Second Normal Form (2NF)",
+          "bullets": [
+            "✅ Must be in 1NF",
+            "✅ No partial dependencies (non-key depends on PART of composite key)",
+            "Only relevant when table has a composite primary key",
+            "❌ Violation: (StudentID, CourseID) → CourseName (depends only on CourseID)",
+            "✅ Fix: Decompose into Student_Course and Course tables"
+          ],
+          "icon": "2️⃣"
+        },
+        {
+          "title": "Third Normal Form (3NF)",
+          "bullets": [
+            "✅ Must be in 2NF",
+            "✅ No transitive dependencies (A→B→C, so A→C indirectly)",
+            "❌ Violation: StudentID → DeptID → DeptName (transitive)",
+            "✅ Fix: Split into Student(SID, DeptID) and Dept(DeptID, DeptName)",
+            "Rule: Every non-key attribute depends on the key, the whole key, and nothing but the key"
+          ],
+          "icon": "3️⃣"
+        },
+        {
+          "title": "BCNF (Boyce-Codd Normal Form)",
+          "bullets": [
+            "✅ Must be in 3NF",
+            "✅ For every FD X→Y, X must be a superkey",
+            "Stricter than 3NF — handles cases 3NF misses",
+            "Example: If a non-candidate-key determines another attribute",
+            "✅ Always achievable through decomposition, but may lose dependency preservation"
+          ],
+          "icon": "🔒"
+        },
+        {
+          "title": "Normal Forms Summary",
+          "table": {
+            "headers": [
+              "NF",
+              "Requirement",
+              "Eliminates"
+            ],
+            "rows": [
+              [
+                "1NF",
+                "Atomic values, unique rows",
+                "Repeating groups"
+              ],
+              [
+                "2NF",
+                "1NF + no partial dependencies",
+                "Partial dependencies"
+              ],
+              [
+                "3NF",
+                "2NF + no transitive dependencies",
+                "Transitive dependencies"
+              ],
+              [
+                "BCNF",
+                "Every determinant is a superkey",
+                "All remaining anomalies"
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cea6dfbc-9a68-45d1-bc5a-535641be6b98",
+      "title": "SQL Commands & Query Processing",
+      "description": "Complete SQL reference slides: DDL, DML, DCL, TCL with examples, subqueries, joins, views, and stored procedures.",
+      "type": "ppt",
+      "url": "#",
+      "module_id": "bc0bc089-25a5-4c9c-9aec-05078b2cb778",
+      "thumbnail": null,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z",
+      "slides": [
+        {
+          "title": "SQL — Structured Query Language",
+          "subtitle": "Complete Command Reference & Query Processing",
+          "layout": "cover",
+          "color": "#3b82f6"
+        },
+        {
+          "title": "SQL Command Categories",
+          "table": {
+            "headers": [
+              "Category",
+              "Commands",
+              "Purpose"
+            ],
+            "rows": [
+              [
+                "DDL",
+                "CREATE, ALTER, DROP, TRUNCATE",
+                "Define/modify schema"
+              ],
+              [
+                "DML",
+                "SELECT, INSERT, UPDATE, DELETE",
+                "Manipulate data"
+              ],
+              [
+                "DCL",
+                "GRANT, REVOKE",
+                "Control access"
+              ],
+              [
+                "TCL",
+                "COMMIT, ROLLBACK, SAVEPOINT",
+                "Manage transactions"
+              ]
+            ]
+          }
+        },
+        {
+          "title": "DDL — Data Definition",
+          "bullets": [
+            "CREATE TABLE students (id INT PRIMARY KEY, name VARCHAR(100));",
+            "ALTER TABLE students ADD COLUMN email VARCHAR(150);",
+            "DROP TABLE students; — removes table permanently",
+            "TRUNCATE TABLE students; — removes all rows, keeps structure",
+            "DDL commands auto-commit (cannot be rolled back)"
+          ],
+          "icon": "🏗️",
+          "code": true
+        },
+        {
+          "title": "DML — Data Manipulation",
+          "bullets": [
+            "INSERT INTO students VALUES (1, 'Rahul', 'rahul@mail.com');",
+            "SELECT name, email FROM students WHERE id > 5;",
+            "UPDATE students SET email = 'new@mail.com' WHERE id = 1;",
+            "DELETE FROM students WHERE id = 10;",
+            "DML changes can be rolled back before COMMIT"
+          ],
+          "icon": "✏️",
+          "code": true
+        },
+        {
+          "title": "JOINs — Combining Tables",
+          "bullets": [
+            "INNER JOIN — Only matching rows from both tables",
+            "LEFT JOIN — All rows from left + matching from right",
+            "RIGHT JOIN — All rows from right + matching from left",
+            "FULL OUTER JOIN — All rows from both tables",
+            "CROSS JOIN — Cartesian product (every combination)",
+            "SELF JOIN — Table joined with itself"
+          ],
+          "icon": "🔗"
+        },
+        {
+          "title": "Aggregate Functions & Grouping",
+          "bullets": [
+            "COUNT(*) — Count all rows; COUNT(col) — Count non-NULL",
+            "SUM(salary), AVG(salary), MIN(salary), MAX(salary)",
+            "GROUP BY department — Groups rows for aggregation",
+            "HAVING COUNT(*) > 5 — Filters groups (not rows)",
+            "ORDER BY salary DESC — Sorts results",
+            "LIMIT 10 OFFSET 20 — Pagination"
+          ],
+          "icon": "📊"
+        },
+        {
+          "title": "Subqueries & Advanced",
+          "bullets": [
+            "Scalar subquery: WHERE salary > (SELECT AVG(salary) FROM emp)",
+            "IN subquery: WHERE dept IN (SELECT dept FROM active_depts)",
+            "EXISTS: WHERE EXISTS (SELECT 1 FROM orders WHERE ...)",
+            "Correlated: references outer query — runs once per row",
+            "Views: CREATE VIEW active_students AS SELECT ...",
+            "Indexes: CREATE INDEX idx_name ON students(name);"
+          ],
+          "icon": "🧠"
+        },
+        {
+          "title": "Query Execution Order",
+          "bullets": [
+            "1. FROM & JOINs — Identify source tables",
+            "2. WHERE — Filter individual rows",
+            "3. GROUP BY — Group remaining rows",
+            "4. HAVING — Filter groups",
+            "5. SELECT — Choose columns & compute expressions",
+            "6. DISTINCT — Remove duplicates",
+            "7. ORDER BY — Sort results",
+            "8. LIMIT/OFFSET — Pagination"
+          ],
+          "layout": "summary",
+          "icon": "📋"
+        }
+      ]
+    },
+    {
+      "id": "ebda03cd-e4eb-4d5f-9d09-ac3e99f46222",
+      "title": "Transaction Management & Recovery",
+      "description": "Slides covering transaction processing, ACID, serializability, recovery techniques, log-based recovery, and checkpointing.",
+      "type": "ppt",
+      "url": "#",
+      "module_id": "74253705-7ad5-4fce-8902-070b48e5d1e9",
+      "thumbnail": null,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z",
+      "slides": [
+        {
+          "title": "Transaction Management",
+          "subtitle": "ACID, Concurrency Control & Recovery",
+          "layout": "cover",
+          "color": "#ef4444"
+        },
+        {
+          "title": "What is a Transaction?",
+          "bullets": [
+            "A logical unit of work — a sequence of operations on the database",
+            "Must satisfy ACID properties for reliability",
+            "Examples: Bank transfer, order placement, seat booking",
+            "Either ALL operations succeed (commit) or NONE do (rollback)",
+            "Transactions are the foundation of database reliability"
+          ],
+          "icon": "🔄"
+        },
+        {
+          "title": "Transaction States",
+          "bullets": [
+            "🟢 Active — Currently executing operations",
+            "🟡 Partially Committed — Final operation executed, awaiting confirmation",
+            "✅ Committed — Successfully completed and saved permanently",
+            "❌ Failed — An error/abort occurred during execution",
+            "⏪ Aborted — Rolled back, database restored to prior state",
+            "After abort: Restart transaction or Kill it"
+          ],
+          "icon": "📊"
+        },
+        {
+          "title": "Concurrency Problems",
+          "bullets": [
+            "👻 Lost Update — T1 writes, T2 writes same data → T1's update is lost",
+            "💀 Dirty Read — T2 reads uncommitted data from T1 (T1 may rollback!)",
+            "🔄 Non-Repeatable Read — T1 reads X twice, gets different values (T2 modified X)",
+            "👤 Phantom Read — T1 re-runs query, new rows appear (T2 inserted rows)",
+            "Solution: Isolation levels and locking protocols"
+          ],
+          "icon": "⚠️"
+        },
+        {
+          "title": "Isolation Levels",
+          "table": {
+            "headers": [
+              "Level",
+              "Dirty Read",
+              "Non-Repeatable",
+              "Phantom"
+            ],
+            "rows": [
+              [
+                "Read Uncommitted",
+                "⚠️ Possible",
+                "⚠️ Possible",
+                "⚠️ Possible"
+              ],
+              [
+                "Read Committed",
+                "✅ Prevented",
+                "⚠️ Possible",
+                "⚠️ Possible"
+              ],
+              [
+                "Repeatable Read",
+                "✅ Prevented",
+                "✅ Prevented",
+                "⚠️ Possible"
+              ],
+              [
+                "Serializable",
+                "✅ Prevented",
+                "✅ Prevented",
+                "✅ Prevented"
+              ]
+            ]
+          }
+        },
+        {
+          "title": "Locking Protocols",
+          "bullets": [
+            "🔓 Shared Lock (S-lock) — Multiple transactions can READ",
+            "🔒 Exclusive Lock (X-lock) — Only ONE transaction can WRITE",
+            "Two-Phase Locking (2PL):",
+            "   📈 Growing Phase — Acquire locks, never release",
+            "   📉 Shrinking Phase — Release locks, never acquire",
+            "Strict 2PL: Hold all locks until commit/abort (prevents cascading rollback)"
+          ],
+          "icon": "🔐"
+        },
+        {
+          "title": "Deadlock",
+          "bullets": [
+            "🔄 Deadlock — Two+ transactions waiting for each other's locks",
+            "Prevention: Wait-Die (older waits, younger dies) or Wound-Wait",
+            "Detection: Build wait-for graph → cycle = deadlock",
+            "Resolution: Abort one transaction (choose victim with least cost)",
+            "Timeout: Abort transaction if waiting too long for a lock"
+          ],
+          "icon": "🚫"
+        },
+        {
+          "title": "Recovery Techniques",
+          "bullets": [
+            "📝 Write-Ahead Logging (WAL) — Write log BEFORE modifying data",
+            "Undo Recovery — Rollback uncommitted transactions after crash",
+            "Redo Recovery — Re-apply committed transactions after crash",
+            "🏁 Checkpointing — Save consistent state periodically",
+            "Reduces recovery time by limiting how far back to scan logs",
+            "ARIES algorithm: Analysis → Redo → Undo phases"
+          ],
+          "layout": "summary",
+          "icon": "🛡️"
+        }
+      ]
+    },
+    {
+      "id": "b7e7523d-4652-4aa8-b56f-a63a38c48c11",
+      "title": "Indexing, B-Trees & Hashing",
+      "description": "Visual slides on indexing methods, B-Tree/B+ Tree structures, hash indexing, and query optimization strategies.",
+      "type": "ppt",
+      "url": "#",
+      "module_id": "8baf582a-0905-4245-8144-fe622478c455",
+      "thumbnail": null,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z",
+      "slides": [
+        {
+          "title": "Indexing & Query Optimization",
+          "subtitle": "B-Trees, Hashing, and Performance Tuning",
+          "layout": "cover",
+          "color": "#8b5cf6"
+        },
+        {
+          "title": "Why Indexing?",
+          "bullets": [
+            "Without index: Full table scan → O(n) for every query",
+            "With index: Direct lookup → O(log n) or O(1)",
+            "Trade-off: Faster reads, slightly slower writes (index maintenance)",
+            "Like a book's index — find info without reading every page",
+            "Crucial for tables with millions+ rows"
+          ],
+          "icon": "⚡"
+        },
+        {
+          "title": "Types of Indexes",
+          "bullets": [
+            "📌 Primary Index — On the primary key column (one per table)",
+            "📎 Secondary Index — On non-key columns (multiple per table)",
+            "📕 Clustered Index — Data physically sorted by index key (only one)",
+            "📗 Non-Clustered Index — Separate structure with pointers to data",
+            "🔢 Dense Index — Entry for EVERY record",
+            "📊 Sparse Index — Entry for some records (e.g., one per block)"
+          ],
+          "icon": "📁"
+        },
+        {
+          "title": "B-Tree Structure",
+          "bullets": [
+            "Self-balancing search tree with multiple keys per node",
+            "All leaves at same level → guaranteed O(log n)",
+            "Order m: each node has at most m children, ⌈m/2⌉ minimum",
+            "Used for exact match AND range queries",
+            "Root has at least 2 children (unless it's a leaf)",
+            "Insertion may cause node splits; deletion may cause merges"
+          ],
+          "icon": "🌳"
+        },
+        {
+          "title": "B+ Tree — The Standard",
+          "bullets": [
+            "Improved B-Tree: ALL data stored in leaf nodes only",
+            "Internal nodes only store keys for navigation",
+            "Leaf nodes are linked as a doubly-linked sorted list",
+            "✅ Excellent for range queries (scan linked leaves)",
+            "✅ More keys fit in internal nodes → shorter tree",
+            "✅ Used by MySQL InnoDB, PostgreSQL, Oracle, SQL Server"
+          ],
+          "icon": "🌲"
+        },
+        {
+          "title": "Hash Indexing",
+          "bullets": [
+            "Uses hash function: h(key) → bucket address",
+            "✅ Perfect for exact-match lookups: O(1) average",
+            "❌ Cannot support range queries (WHERE salary > 50000)",
+            "❌ Hash collisions require chaining or open addressing",
+            "Static Hashing: Fixed number of buckets",
+            "Dynamic (Extendible) Hashing: Grows/shrinks automatically"
+          ],
+          "icon": "#️⃣"
+        },
+        {
+          "title": "Index Comparison",
+          "table": {
+            "headers": [
+              "Feature",
+              "B+ Tree",
+              "Hash Index"
+            ],
+            "rows": [
+              [
+                "Exact match",
+                "O(log n)",
+                "O(1) avg"
+              ],
+              [
+                "Range query",
+                "✅ Excellent",
+                "❌ Not supported"
+              ],
+              [
+                "Sorted output",
+                "✅ Yes (leaves linked)",
+                "❌ No"
+              ],
+              [
+                "Space usage",
+                "Moderate",
+                "Variable"
+              ],
+              [
+                "Most common",
+                "✅ Default in RDBMS",
+                "Memory-optimized tables"
+              ]
+            ]
+          }
+        },
+        {
+          "title": "Query Optimization Tips",
+          "bullets": [
+            "📌 Create indexes on WHERE, JOIN, and ORDER BY columns",
+            "❌ Avoid SELECT * — fetch only needed columns",
+            "✅ Use EXISTS instead of IN for correlated subqueries",
+            "❌ Avoid functions on indexed columns: WHERE YEAR(date) = 2024",
+            "✅ Use EXPLAIN/ANALYZE to view execution plans",
+            "📊 Update statistics regularly for accurate optimizer decisions"
+          ],
+          "layout": "summary",
+          "icon": "🎯"
+        }
+      ]
+    },
+    {
+      "id": "c3cb296d-8000-48e0-a49a-29d177753446",
+      "title": "Relational Algebra & Relational Calculus",
+      "description": "Formal foundations: relational algebra operators, tuple/domain calculus, with solved examples.",
+      "type": "ppt",
+      "url": "#",
+      "module_id": null,
+      "thumbnail": null,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z",
+      "slides": [
+        {
+          "title": "Relational Algebra",
+          "subtitle": "Formal Query Languages & Operations",
+          "layout": "cover",
+          "color": "#06b6d4"
+        },
+        {
+          "title": "What is Relational Algebra?",
+          "bullets": [
+            "A procedural query language (step-by-step operations)",
+            "Foundation of SQL — SQL is based on relational algebra",
+            "Operations take one or two relations as input, produce one as output",
+            "Used by query optimizers internally to plan query execution",
+            "Two types: Unary (one table) and Binary (two tables)"
+          ],
+          "icon": "🧮"
+        },
+        {
+          "title": "Unary Operations",
+          "bullets": [
+            "σ (Selection) — Filter rows: σ_age>20(Students)",
+            "π (Projection) — Choose columns: π_name,age(Students)",
+            "ρ (Rename) — Rename table/columns: ρ_S(Students)",
+            "Selection = WHERE clause in SQL",
+            "Projection = Column list in SELECT clause"
+          ],
+          "icon": "🔍"
+        },
+        {
+          "title": "Binary Operations — Set",
+          "bullets": [
+            "∪ (Union) — All tuples from both relations (no duplicates)",
+            "∩ (Intersection) — Only tuples present in BOTH relations",
+            "— (Difference) — Tuples in R1 but NOT in R2",
+            "× (Cartesian Product) — Every combination of tuples",
+            "Union-compatible: same number of columns, same domains"
+          ],
+          "icon": "➕"
+        },
+        {
+          "title": "Join Operations",
+          "bullets": [
+            "⋈ (Natural Join) — Match on ALL common attributes automatically",
+            "⋈_θ (Theta Join) — Join with any condition (=, <, >, ≠)",
+            "⋈_= (Equi-Join) — Theta join with only equality conditions",
+            "⟕ (Left Outer Join) — All left tuples + matching right",
+            "⟖ (Right Outer Join) — All right tuples + matching left",
+            "⟗ (Full Outer Join) — All tuples from both sides"
+          ],
+          "icon": "🔗"
+        },
+        {
+          "title": "Division Operation",
+          "bullets": [
+            "R ÷ S — Find tuples in R associated with ALL tuples in S",
+            "Example: \"Find students enrolled in ALL courses\"",
+            "Equivalent to double NOT EXISTS in SQL",
+            "R(A,B) ÷ S(B) = π_A(R) — π_A((π_A(R) × S) — R)",
+            "One of the most complex relational algebra operations"
+          ],
+          "icon": "➗"
+        },
+        {
+          "title": "Relational Calculus",
+          "bullets": [
+            "Tuple Relational Calculus (TRC) — Non-procedural, declarative",
+            "{ t | P(t) } — \"Set of tuples t such that predicate P is true\"",
+            "Domain Relational Calculus (DRC) — Operates on domain values",
+            "{ <x₁, x₂> | P(x₁, x₂) } — \"Set of domain values satisfying P\"",
+            "SQL is primarily based on TRC",
+            "Algebra = HOW (procedural), Calculus = WHAT (declarative)"
+          ],
+          "icon": "📐"
+        },
+        {
+          "title": "Algebra ↔ SQL Equivalence",
+          "table": {
+            "headers": [
+              "Algebra",
+              "SQL Equivalent",
+              "Example"
+            ],
+            "rows": [
+              [
+                "σ (Select)",
+                "WHERE clause",
+                "σ_age>20(S) → WHERE age>20"
+              ],
+              [
+                "π (Project)",
+                "SELECT columns",
+                "π_name(S) → SELECT name"
+              ],
+              [
+                "⋈ (Join)",
+                "JOIN ... ON",
+                "⋈ → INNER JOIN"
+              ],
+              [
+                "∪ (Union)",
+                "UNION",
+                "R ∪ S → R UNION S"
+              ],
+              [
+                "— (Diff)",
+                "EXCEPT",
+                "R-S → R EXCEPT S"
+              ],
+              [
+                "÷ (Division)",
+                "NOT EXISTS NOT EXISTS",
+                "Double negation pattern"
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "72c3e178-870b-4b22-bdf9-e7ecb9b11317",
+      "title": "Database Security & Authorization",
+      "description": "Database security concepts: access control, SQL injection prevention, RBAC, audit trails, and encryption.",
+      "type": "ppt",
+      "url": "#",
+      "module_id": null,
+      "thumbnail": null,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-14T06:38:20.422Z",
+      "slides": [
+        {
+          "title": "Database Security",
+          "subtitle": "Authorization, Access Control & Threat Prevention",
+          "layout": "cover",
+          "color": "#e11d48"
+        },
+        {
+          "title": "Why Database Security?",
+          "bullets": [
+            "Databases store the most valuable asset — DATA",
+            "Breaches cost millions in damages and reputation",
+            "Regulatory compliance: GDPR, HIPAA, PCI-DSS",
+            "Insider threats are as dangerous as external attacks",
+            "Security must be implemented at multiple layers"
+          ],
+          "icon": "🛡️"
+        },
+        {
+          "title": "Access Control Models",
+          "bullets": [
+            "DAC (Discretionary) — Owner grants/revokes permissions",
+            "MAC (Mandatory) — System-enforced security labels (Top Secret, Secret, etc.)",
+            "RBAC (Role-Based) — Permissions assigned to roles, users get roles",
+            "GRANT SELECT ON students TO professor_role;",
+            "REVOKE INSERT ON grades FROM student_role;"
+          ],
+          "icon": "🔐"
+        },
+        {
+          "title": "SQL Injection",
+          "bullets": [
+            "#1 web application vulnerability (OWASP Top 10)",
+            "Attacker injects malicious SQL through user input",
+            "Example: Input: ' OR 1=1 -- bypasses login",
+            "Query becomes: SELECT * FROM users WHERE user='' OR 1=1 --'",
+            "❌ Never concatenate user input into SQL strings",
+            "✅ Use parameterized queries / prepared statements ALWAYS"
+          ],
+          "icon": "💉"
+        },
+        {
+          "title": "Prevention Techniques",
+          "bullets": [
+            "✅ Parameterized Queries — Separate code from data",
+            "✅ Input Validation — Whitelist allowed characters",
+            "✅ Least Privilege — Give minimum required permissions",
+            "✅ Stored Procedures — Pre-compiled, harder to inject",
+            "✅ WAF (Web Application Firewall) — Filter malicious requests",
+            "✅ Regular Security Audits — Scan for vulnerabilities"
+          ],
+          "icon": "🧱"
+        },
+        {
+          "title": "Encryption",
+          "bullets": [
+            "🔒 Encryption at Rest — Data encrypted on disk (AES-256)",
+            "🔐 Encryption in Transit — TLS/SSL for network communication",
+            "🔑 Transparent Data Encryption (TDE) — Automatic, app-transparent",
+            "#️⃣ Hashing — One-way for passwords (bcrypt, argon2)",
+            "Never store passwords in plain text!",
+            "Column-level encryption for sensitive fields (SSN, credit cards)"
+          ],
+          "icon": "🔒"
+        },
+        {
+          "title": "Audit & Monitoring",
+          "bullets": [
+            "📋 Audit Trails — Log all data access and modifications",
+            "👁️ Monitor failed login attempts and unusual queries",
+            "⏰ Real-time alerting for suspicious activity",
+            "📊 Regular compliance reporting",
+            "🔍 Database Activity Monitoring (DAM) tools",
+            "Retain logs for regulatory required periods"
+          ],
+          "layout": "summary",
+          "icon": "📋"
+        }
+      ]
+    }
+  ],
+  "er_diagrams": []
+}
