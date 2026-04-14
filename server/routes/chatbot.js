@@ -13,7 +13,7 @@ router.get('/status', (req, res) => {
     status: 'ok',
     apiKeyConfigured: !!apiKey,
     apiKeyPreview: maskKey(apiKey),
-    engine: 'gemini-1.5-flash-8b'
+    engine: 'gemini-1.5-flash'
   });
 });
 
@@ -61,7 +61,7 @@ router.post('/ask', async (req, res) => {
     const options = {
       hostname: 'generativelanguage.googleapis.com',
       port: 443,
-      path: `/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${apiKey}`,
+      path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -121,3 +121,4 @@ router.post('/ask', async (req, res) => {
 });
 
 export default router;
+
