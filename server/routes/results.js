@@ -9,15 +9,27 @@ router.get('/my', authenticate, requireRole('student'), async (req, res) => {
   try {
     const attempts = db.findAll('quiz_attempts', a => a.student_id === req.user.id && a.status === 'completed');
     
-    const enriched = attempts.map(a => {
+    const enrichedResults = attempts.map(a => {
       const quiz = db.findOne('quizzes', q => q.id === a.quiz_id);
       return {
         ...a,
-        quizzes: quiz
+        quiz_title: quiz?.title || 'Unknown',
+        quiz_total_points: quiz?.total_points || a.total_points
       };
     }).sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
 
-    res.json(enriched);
+    const totalAttempts = enrichedResults.length;
+    const avgScore = totalAttempts > 0 
+      ? Math.round(enrichedResults.reduce((sum, r) => sum + (r.score / r.total_points * 100), 0) / totalAttempts) 
+      : 0;
+    const bestScore = totalAttempts > 0 
+      ? Math.max(...enrichedResults.map(r => Math.round(r.score / r.total_points * 100))) 
+      : 0;
+
+    res.json({ 
+      results: enrichedResults, 
+      stats: { totalAttempts, avgScore, bestScore } 
+    });
   } catch (err) {
     console.error('Get results error:', err);
     res.status(500).json({ error: 'Internal server error' });
