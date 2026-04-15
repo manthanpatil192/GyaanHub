@@ -1,4 +1,4 @@
-const API_BASE = 'https://gyaanhub-backend.onrender.com/api';
+const API_BASE = '/api';
 
 export async function renderDatabaseViewer() {
     const app = document.getElementById('app');
