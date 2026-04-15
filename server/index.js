@@ -10,6 +10,7 @@ import resultRoutes from './routes/results.js';
 import materialRoutes from './routes/materials.js';
 import erDiagramRoutes from './routes/er_diagrams.js';
 import chatbotRoutes from './routes/chatbot.js';
+import db from './db/schema.js';
 
 // Load environment variables
 dotenv.config();
@@ -55,21 +56,21 @@ app.get('/api/health', (req, res) => {
 });
 
 // Admin DB Dump for Presentation
-app.get('/api/admin/dump', async (req, res) => {
+app.get('/api/admin/dump', (req, res) => {
   try {
-    const [users, modules, quizzes, materials] = await Promise.all([
-      supabase.from('users').select('id, username, email, full_name, role, created_at'),
-      supabase.from('modules').select('*'),
-      supabase.from('quizzes').select('*'),
-      supabase.from('materials').select('*')
-    ]);
+    const users = db.findAll('users').map(u => ({ id: u.id, username: u.username, email: u.email, full_name: u.full_name, role: u.role, created_at: u.created_at }));
+    const modules = db.findAll('modules');
+    const quizzes = db.findAll('quizzes');
+    const materials = db.findAll('materials');
+    
     res.json({
-      users: users.data || [],
-      modules: modules.data || [],
-      quizzes: quizzes.data || [],
-      materials: materials.data || []
+      users,
+      modules,
+      quizzes,
+      materials
     });
   } catch (err) {
+    console.error('Dump error:', err);
     res.status(500).json({ error: 'Failed to dump database' });
   }
 });
