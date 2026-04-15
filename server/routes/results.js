@@ -5,7 +5,7 @@ import { authenticate, requireRole } from '../middleware/auth.js';
 const router = Router();
 
 // Get student's previous results
-router.get('/student', authenticate, requireRole('student'), async (req, res) => {
+router.get('/my', authenticate, requireRole('student'), async (req, res) => {
   try {
     const attempts = db.findAll('quiz_attempts', a => a.student_id === req.user.id && a.status === 'completed');
     
