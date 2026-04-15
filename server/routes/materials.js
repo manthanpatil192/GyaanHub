@@ -3,15 +3,23 @@ import { v4 as uuid } from 'uuid';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { existsSync, mkdirSync } from 'fs';
-import { supabase } from '../utils/supabase.js';
+import db from '../db/schema.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const uploadsDir = path.join(__dirname, '../uploads');
 
-// Use memory storage for direct cloud streaming
-const storage = multer.memoryStorage();
+// Configure local disk storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `${uuid()}${ext}`);
+  }
+});
 
 const upload = multer({
   storage,
@@ -32,24 +40,25 @@ const router = Router();
 // Get all materials
 router.get('/', authenticate, async (req, res) => {
   try {
-    const { data: materials, error } = await supabase
-      .from('materials')
-      .select(`
-        *,
-        users (full_name),
-        modules (title),
-        purchases (user_id)
-      `)
-      .order('created_at', { ascending: false });
+    const materials = db.findAll('materials');
+    
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const materialsList = materials.map(m => {
+      const user = db.findOne('users', u => u.id === m.created_by);
+      const module = db.findOne('modules', mod => mod.id === m.module_id);
+      const hasPurchased = db.findOne('purchases', p => p.user_id === req.user.id && p.material_id === m.id);
 
-    if (error) throw error;
+      // Prepend base URL for local uploads if needed
+      const fullUrl = m.url.startsWith('/') ? `${baseUrl}${m.url}` : m.url;
 
-    const materialsList = materials.map(m => ({
-      ...m,
-      creator_name: m.users?.full_name || 'Unknown',
-      module_title: m.modules?.title || null,
-      is_purchased: m.purchases?.some(p => p.user_id === req.user.id) || m.price <= 0
-    }));
+      return {
+        ...m,
+        url: fullUrl,
+        creator_name: user?.full_name || 'Unknown',
+        module_title: module?.title || null,
+        is_purchased: !!hasPurchased || m.price <= 0
+      };
+    }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     res.json(materialsList);
   } catch (err) {
@@ -58,64 +67,38 @@ router.get('/', authenticate, async (req, res) => {
   }
 });
 
-// Get materials by type
-router.get('/type/:type', authenticate, async (req, res) => {
-  try {
-    const { data: materials, error } = await supabase
-      .from('materials')
-      .select(`
-        *,
-        users (full_name),
-        modules (title)
-      `)
-      .eq('type', req.params.type)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    const materialsList = materials.map(m => ({
-      ...m,
-      creator_name: m.users?.full_name || 'Unknown',
-      module_title: m.modules?.title || null
-    }));
-
-    res.json(materialsList);
-  } catch (err) {
-    console.error('Get materials by type error:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Create material
+// Create material (non-file)
 router.post('/', authenticate, requireRole('teacher'), async (req, res) => {
   try {
-    const { title, description, type, url, module_id, thumbnail, slides } = req.body;
+    const { title, description, type, url, module_id, thumbnail, slides, price } = req.body;
 
     if (!title || !type) {
       return res.status(400).json({ error: 'Title and type are required' });
     }
 
-    const { data: material, error } = await supabase
-      .from('materials')
-      .insert([{
-        title, description: description || '',
-        type, url: url || '#', module_id: module_id || null,
-        thumbnail: thumbnail || null,
-        slides: slides || null,
-        created_by: req.user.id
-      }])
-      .select()
-      .single();
+    const newMaterial = {
+      id: uuid(),
+      title,
+      description: description || '',
+      type,
+      url: url || '#',
+      module_id: module_id || null,
+      thumbnail: thumbnail || null,
+      slides: slides || null,
+      price: parseFloat(price) || 0,
+      created_by: req.user.id,
+      created_at: new Date().toISOString()
+    };
 
-    if (error) throw error;
-    res.status(201).json(material);
+    db.insert('materials', newMaterial);
+    res.status(201).json(newMaterial);
   } catch (err) {
     console.error('Create material error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Upload PDF/PPT file
+// Upload PDF/PPT file to local storage
 router.post('/upload', authenticate, requireRole('teacher'), upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
@@ -124,53 +107,32 @@ router.post('/upload', authenticate, requireRole('teacher'), upload.single('file
 
     const { title, description, module_id, type, price } = req.body;
 
-    // Ensure bucket exists (ignores error if it already does)
-    await supabase.storage.createBucket('materials', { public: true });
+    // Construct local URL
+    // In production/Vercel, we can't easily get the absolute URL, 
+    // but the frontend can prefix it or we can use a relative /uploads path.
+    const publicUrl = `/uploads/${req.file.filename}`;
 
-    const ext = path.extname(req.file.originalname).toLowerCase();
-    const fileName = `${uuid()}${ext}`;
+    const newMaterial = {
+      id: uuid(),
+      title: title || req.file.originalname,
+      description: description || `Uploaded file: ${req.file.originalname}`,
+      type: type || 'pdf',
+      price: parseFloat(price) || 2,
+      url: publicUrl,
+      module_id: module_id || null,
+      created_by: req.user.id,
+      created_at: new Date().toISOString()
+    };
 
-    const { error: uploadError } = await supabase.storage
-      .from('materials')
-      .upload(fileName, req.file.buffer, {
-        contentType: req.file.mimetype,
-        upsert: true
-      });
-
-    if (uploadError) {
-        console.error('Storage upload error:', uploadError);
-        throw new Error('Failed to upload file to cloud storage');
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from('materials')
-      .getPublicUrl(fileName);
-
-    const publicUrl = publicUrlData.publicUrl;
-
-    const { data: material, error } = await supabase
-      .from('materials')
-      .insert([{
-        title: title || req.file.originalname,
-        description: description || `Uploaded file: ${req.file.originalname}`,
-        type: type || 'pdf',
-        price: parseFloat(price) || 0,
-        url: publicUrl,
-        module_id: module_id || null,
-        created_by: req.user.id
-      }])
-      .select()
-      .single();
-
-    if (error) throw error;
-    res.status(201).json(material);
+    db.insert('materials', newMaterial);
+    res.status(201).json(newMaterial);
   } catch (err) {
     console.error('Upload material error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Record a purchase (Simulated UPI)
+// Record a purchase (Local)
 router.post('/purchase', authenticate, async (req, res) => {
   try {
     const { material_id, amount } = req.body;
@@ -179,25 +141,22 @@ router.post('/purchase', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'Material ID is required' });
     }
 
-    const { data, error } = await supabase
-      .from('purchases')
-      .insert([{
-        user_id: req.user.id,
-        material_id,
-        amount: amount || 2,
-        status: 'completed'
-      }])
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === '23505') { // Unique constraint
-        return res.status(400).json({ error: 'Material already purchased' });
-      }
-      throw error;
+    const existing = db.findOne('purchases', p => p.user_id === req.user.id && p.material_id === material_id);
+    if (existing) {
+      return res.status(400).json({ error: 'Material already purchased' });
     }
 
-    res.status(201).json(data);
+    const newPurchase = {
+      id: uuid(),
+      user_id: req.user.id,
+      material_id,
+      amount: amount || 2,
+      status: 'completed',
+      created_at: new Date().toISOString()
+    };
+
+    db.insert('purchases', newPurchase);
+    res.status(201).json(newPurchase);
   } catch (err) {
     console.error('Purchase error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -207,12 +166,10 @@ router.post('/purchase', authenticate, async (req, res) => {
 // Delete material
 router.delete('/:id', authenticate, requireRole('teacher'), async (req, res) => {
   try {
-    const { error } = await supabase
-      .from('materials')
-      .delete()
-      .eq('id', req.params.id);
-
-    if (error) throw error;
+    const deleted = db.delete('materials', req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Material not found' });
+    
+    // Optionally delete the file from disk if it's a local upload
     res.json({ message: 'Material deleted' });
   } catch (err) {
     console.error('Delete material error:', err);

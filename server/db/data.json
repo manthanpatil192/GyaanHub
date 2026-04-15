@@ -2275,7 +2275,39 @@
           "icon": "📋"
         }
       ]
+    },
+    {
+      "id": "12f6b8e2-2ff2-48d3-8024-36ba7f9a7b50",
+      "title": "Verification Paper",
+      "description": "Test PDF",
+      "type": "pqqs",
+      "price": 2,
+      "url": "/uploads/689fb035-7f4e-42e5-9e61-2671a13933f3.pdf",
+      "module_id": "b0754b49-593a-40da-ba4c-9a463a33efff",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-15T15:50:33.111Z"
+    },
+    {
+      "id": "sample-pqq-final",
+      "title": "📄 Final Exam Sample Paper",
+      "description": "Complete offline sample paper for DBMS.",
+      "type": "pqqs",
+      "price": 2,
+      "url": "/uploads/presentation_sample.pdf",
+      "module_id": "b0754b49-593a-40da-ba4c-9a463a33efff",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-15T16:02:16.985Z"
     }
   ],
-  "er_diagrams": []
+  "er_diagrams": [],
+  "purchases": [
+    {
+      "id": "d4d44691-c52e-47a7-a1c5-6d975efe4df7",
+      "user_id": "fc0001ad-853e-4a4f-8b8c-b65e8ef10432",
+      "material_id": "12f6b8e2-2ff2-48d3-8024-36ba7f9a7b50",
+      "amount": 2,
+      "status": "completed",
+      "created_at": "2026-04-15T15:51:44.527Z"
+    }
+  ]
 }

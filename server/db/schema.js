@@ -19,6 +19,7 @@ function defaultStore() {
     quiz_attempts: [],
     answers: [],
     materials: [],
+    purchases: [],
     er_diagrams: []
   };
 }
