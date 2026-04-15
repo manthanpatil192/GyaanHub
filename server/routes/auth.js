@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
-import { supabase } from '../utils/supabase.js';
+import { v4 as uuid } from 'uuid';
+import db from '../db/schema.js';
 import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
@@ -21,11 +22,7 @@ router.post('/register', async (req, res) => {
     }
 
     // Check if user already exists
-    const { data: existingUser, error: fetchError } = await supabase
-      .from('users')
-      .select('id')
-      .or(`username.eq.${username},email.eq.${email}`)
-      .single();
+    const existingUser = db.findOne('users', u => u.username === username || u.email === email);
 
     if (existingUser) {
       return res.status(409).json({ error: 'Username or email already exists' });
@@ -33,19 +30,15 @@ router.post('/register', async (req, res) => {
 
     const password_hash = bcrypt.hashSync(password, 10);
     
-    const { data: newUser, error: insertError } = await supabase
-      .from('users')
-      .insert([{
-        username,
-        email,
-        password_hash,
-        full_name,
-        role
-      }])
-      .select()
-      .single();
-
-    if (insertError) throw insertError;
+    const newUser = db.insert('users', {
+      id: uuid(),
+      username,
+      email,
+      password_hash,
+      full_name,
+      role,
+      created_at: new Date().toISOString()
+    });
 
     res.status(201).json({ 
       id: newUser.id, 
@@ -69,13 +62,9 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', username)
-      .single();
+    const user = db.findOne('users', u => u.username === username);
 
-    if (!user || (error && error.code !== 'PGRST116') || !bcrypt.compareSync(password, user.password_hash)) {
+    if (!user || !bcrypt.compareSync(password, user.password_hash)) {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 

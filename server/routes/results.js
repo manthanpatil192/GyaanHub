@@ -1,81 +1,53 @@
 import { Router } from 'express';
-import { supabase } from '../utils/supabase.js';
+import db from '../db/schema.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 
 const router = Router();
 
-// Student's own results
-router.get('/my', authenticate, requireRole('student'), async (req, res) => {
+// Get student's previous results
+router.get('/student', authenticate, requireRole('student'), async (req, res) => {
   try {
-    const { data: attempts, error } = await supabase
-      .from('quiz_attempts')
-      .select(`
-        *,
-        quizzes (title, time_limit_minutes, total_points)
-      `)
-      .eq('student_id', req.user.id)
-      .eq('status', 'completed')
-      .order('completed_at', { ascending: false });
+    const attempts = db.findAll('quiz_attempts', a => a.student_id === req.user.id && a.status === 'completed');
+    
+    const enriched = attempts.map(a => {
+      const quiz = db.findOne('quizzes', q => q.id === a.quiz_id);
+      return {
+        ...a,
+        quizzes: quiz
+      };
+    }).sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
 
-    if (error) throw error;
-
-    const results = attempts.map(a => ({
-      ...a,
-      quiz_title: a.quizzes?.title || 'Unknown',
-      time_limit_minutes: a.quizzes?.time_limit_minutes,
-      quiz_total_points: a.quizzes?.total_points
-    }));
-
-    const totalAttempts = results.length;
-    const avgScore = totalAttempts > 0 
-      ? Math.round(results.reduce((sum, r) => sum + (r.score / r.total_points * 100), 0) / totalAttempts) 
-      : 0;
-    const bestScore = totalAttempts > 0 
-      ? Math.max(...results.map(r => Math.round(r.score / r.total_points * 100))) 
-      : 0;
-
-    res.json({ results, stats: { totalAttempts, avgScore, bestScore } });
+    res.json(enriched);
   } catch (err) {
-    console.error('Get my results error:', err);
+    console.error('Get results error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Results for a specific quiz (teacher)
+// Get all results for a specific quiz (teacher only)
 router.get('/quiz/:quizId', authenticate, requireRole('teacher'), async (req, res) => {
   try {
-    const { data: quiz, error: quizError } = await supabase
-      .from('quizzes')
-      .select('*')
-      .eq('id', req.params.quizId)
-      .single();
+    const quiz = db.findOne('quizzes', q => q.id === req.params.quizId);
+    if (!quiz) return res.status(404).json({ error: 'Quiz not found' });
 
-    if (quizError || !quiz) return res.status(404).json({ error: 'Quiz not found' });
+    const attempts = db.findAll('quiz_attempts', a => a.quiz_id === req.params.quizId && a.status === 'completed');
+    
+    const enrichedResults = attempts.map(a => {
+      const user = db.findOne('users', u => u.id === a.student_id);
+      return {
+        ...a,
+        users: { full_name: user?.full_name || 'Unknown', username: user?.username, email: user?.email }
+      };
+    }).sort((a, b) => b.score - a.score);
 
-    const { data: attempts, error: attemptsError } = await supabase
-      .from('quiz_attempts')
-      .select(`
-        *,
-        users (full_name, username, email)
-      `)
-      .eq('quiz_id', req.params.quizId)
-      .eq('status', 'completed')
-      .order('score', { ascending: false });
+    const avgScore = enrichedResults.length > 0 ? Math.round(enrichedResults.reduce((s, r) => s + r.score, 0) / enrichedResults.length) : 0;
+    const highestScore = enrichedResults.length > 0 ? Math.max(...enrichedResults.map(r => r.score)) : 0;
 
-    if (attemptsError) throw attemptsError;
-
-    const results = attempts.map(a => ({
-      ...a,
-      student_name: a.users?.full_name,
-      student_username: a.users?.username,
-      student_email: a.users?.email
-    }));
-
-    const avgScore = results.length > 0 ? Math.round(results.reduce((s, r) => s + r.score, 0) / results.length) : 0;
-    const highestScore = results.length > 0 ? Math.max(...results.map(r => r.score)) : 0;
-    const lowestScore = results.length > 0 ? Math.min(...results.map(r => r.score)) : 0;
-
-    res.json({ quiz, results, stats: { totalAttempts: results.length, avgScore, highestScore, lowestScore } });
+    res.json({ 
+      quiz, 
+      results: enrichedResults, 
+      stats: { totalAttempts: enrichedResults.length, avgScore, highestScore } 
+    });
   } catch (err) {
     console.error('Get quiz results error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -85,22 +57,10 @@ router.get('/quiz/:quizId', authenticate, requireRole('teacher'), async (req, re
 // All students overview (teacher)
 router.get('/students', authenticate, requireRole('teacher'), async (req, res) => {
   try {
-    // This is more complex in SQL. We can fetch students and then aggregates, 
-    // or use a view/RPC. For now, we'll fetch students and then perform a join/group in JS
-    // OR we can use Supabase's powerful query to get attempts count per student
-    
-    const { data: students, error } = await supabase
-      .from('users')
-      .select(`
-        id, full_name, username, email,
-        quiz_attempts (score, total_points, status, completed_at)
-      `)
-      .eq('role', 'student');
-
-    if (error) throw error;
+    const students = db.findAll('users', u => u.role === 'student');
 
     const enrichedStudents = students.map(s => {
-      const attempts = (s.quiz_attempts || []).filter(a => a.status === 'completed');
+      const attempts = db.findAll('quiz_attempts', a => a.student_id === s.id && a.status === 'completed');
       const quizzesTaken = attempts.length;
       const avgPct = quizzesTaken > 0 ? attempts.reduce((sum, a) => sum + (a.score / a.total_points * 100), 0) / quizzesTaken : 0;
       const bestPct = quizzesTaken > 0 ? Math.max(...attempts.map(a => a.score / a.total_points * 100)) : 0;
@@ -125,53 +85,44 @@ router.get('/students', authenticate, requireRole('teacher'), async (req, res) =
 });
 
 // Detailed attempt review
-router.get('/attempt/:attemptId', authenticate, async (req, res) => {
+router.get('/attempt/:id', authenticate, async (req, res) => {
   try {
-    const { data: attempt, error } = await supabase
-      .from('quiz_attempts')
-      .select(`
-        *,
-        quizzes (title, time_limit_minutes),
-        users (full_name),
-        answers (
-          *,
-          questions (*)
-        )
-      `)
-      .eq('id', req.params.attemptId)
-      .single();
-
-    if (error || !attempt) return res.status(404).json({ error: 'Attempt not found' });
+    const attempt = db.findOne('quiz_attempts', a => a.id === req.params.id);
+    if (!attempt) return res.status(404).json({ error: 'Attempt not found' });
 
     // Students can only see their own attempts
     if (req.user.role === 'student' && attempt.student_id !== req.user.id) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const answers = (attempt.answers || []).map(ans => {
-      const q = ans.questions;
-      return { 
-        ...ans, 
-        question_text: q?.question_text, 
-        option_a: q?.option_a, 
-        option_b: q?.option_b, 
-        option_c: q?.option_c, 
-        option_d: q?.option_d, 
-        correct_option: q?.correct_option, 
-        explanation: q?.explanation, 
-        points: q?.points, 
-        sort_order: q?.sort_order 
-      };
-    }).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    const quiz = db.findOne('quizzes', q => q.id === attempt.quiz_id);
+    const user = db.findOne('users', u => u.id === attempt.student_id);
+    
+    const detailedAnswers = db.findAll('answers', ans => ans.attempt_id === attempt.id)
+      .map(ans => {
+        const q = db.findOne('questions', que => que.id === ans.question_id);
+        return { 
+          ...ans, 
+          question_text: q?.question_text, 
+          option_a: q?.option_a, 
+          option_b: q?.option_b, 
+          option_c: q?.option_c, 
+          option_d: q?.option_d, 
+          correct_option: q?.correct_option, 
+          explanation: q?.explanation, 
+          points: q?.points, 
+          sort_order: q?.sort_order 
+        };
+      }).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
     res.json({
       attempt: { 
         ...attempt, 
-        quiz_title: attempt.quizzes?.title, 
-        time_limit_minutes: attempt.quizzes?.time_limit_minutes, 
-        student_name: attempt.users?.full_name 
+        quiz_title: quiz?.title, 
+        time_limit_minutes: quiz?.time_limit_minutes, 
+        student_name: user?.full_name 
       },
-      answers,
+      answers: detailedAnswers,
       percentage: Math.round((attempt.score / attempt.total_points) * 100)
     });
   } catch (err) {

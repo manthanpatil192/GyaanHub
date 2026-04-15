@@ -1,32 +1,20 @@
 import { Router } from 'express';
-import { supabase } from '../utils/supabase.js';
+import { v4 as uuid } from 'uuid';
+import db from '../db/schema.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 
 const router = Router();
 
 // Get all modules
-router.get('/', authenticate, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    // We join with users to get creator name and also need to count quizzes
-    // In Supabase/PostgreSQL, we can fetch all and then process, or use RPC
-    const { data: modules, error } = await supabase
-      .from('modules')
-      .select(`
-        *,
-        users (full_name),
-        quizzes (id)
-      `)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    const modulesList = modules.map(m => ({
+    const modules = db.findAll('modules');
+    const enriched = modules.map(m => ({
       ...m,
-      creator_name: m.users?.full_name || 'Unknown',
-      quiz_count: m.quizzes?.length || 0
+      quiz_count: db.count('quizzes', q => q.module_id === m.id),
+      material_count: db.count('materials', mat => mat.module_id === m.id)
     }));
-
-    res.json(modulesList);
+    res.json(enriched);
   } catch (err) {
     console.error('Get modules error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -34,33 +22,15 @@ router.get('/', authenticate, async (req, res) => {
 });
 
 // Get single module
-router.get('/:id', authenticate, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const { data: mod, error } = await supabase
-      .from('modules')
-      .select(`
-        *,
-        users (full_name),
-        quizzes (*)
-      `)
-      .eq('id', req.params.id)
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') return res.status(404).json({ error: 'Module not found' });
-      throw error;
-    }
-
-    const quizzes = (mod.quizzes || [])
-      .filter(q => q.is_active)
-      .map(({ id, title, description, time_limit_minutes, total_points }) => ({ 
-        id, title, description, time_limit_minutes, total_points 
-      }));
-
-    res.json({ 
-      ...mod, 
-      creator_name: mod.users?.full_name, 
-      quizzes 
+    const mod = db.findOne('modules', m => m.id === req.params.id);
+    if (!mod) return res.status(404).json({ error: 'Module not found' });
+    
+    res.json({
+      ...mod,
+      quizzes: db.findAll('quizzes', q => q.module_id === mod.id),
+      materials: db.findAll('materials', mat => mat.module_id === mod.id)
     });
   } catch (err) {
     console.error('Get module error:', err);
@@ -68,7 +38,7 @@ router.get('/:id', authenticate, async (req, res) => {
   }
 });
 
-// Create module
+// Create module (teacher only)
 router.post('/', authenticate, requireRole('teacher'), async (req, res) => {
   try {
     const { title, description, content, category, difficulty, icon } = req.body;
