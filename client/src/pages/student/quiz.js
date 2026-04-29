@@ -95,8 +95,8 @@ export async function renderQuiz(quizId) {
 
     let tabSwitches = 0;
     let isSubmitting = false;
+    let lastViolationTime = 0;
 
-    // Request fullscreen on start (must be triggered by user interaction)
     const requestFullscreen = () => {
       const elem = document.documentElement;
       if (elem.requestFullscreen) elem.requestFullscreen();
@@ -104,27 +104,50 @@ export async function renderQuiz(quizId) {
       else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
     };
 
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        tabSwitches++;
-        if (tabSwitches >= 3) {
-          showToast(`🚫 Quiz auto-submitted! Maximum tab switches (3) exceeded.`, 'error');
-          submitQuiz();
-        } else {
-          showToast(`⚠️ Warning: Tab switch detected! (Attempt ${tabSwitches}/3). Quiz will auto-submit on 3rd attempt.`, 'error');
-        }
+    const recordViolation = (type) => {
+      const now = Date.now();
+      if (now - lastViolationTime < 2000) return; // Prevent double strikes within 2 seconds
+      
+      lastViolationTime = now;
+      tabSwitches++;
+
+      if (tabSwitches >= 3) {
+        alert(`🚫 STRICT MODE VIOLATION: Quiz auto-submitted! Maximum warnings (3) exceeded.`);
+        submitQuiz();
+      } else {
+        showStrictModal(tabSwitches);
       }
     };
 
+    const showStrictModal = (count) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.style.zIndex = '10000';
+      overlay.innerHTML = `
+        <div class="modal" style="border: 2px solid var(--rose-500); max-width: 450px;">
+          <h2 style="color:var(--rose-600); margin-bottom:var(--space-md);">⚠️ STRICT MODE WARNING (${count}/3)</h2>
+          <p style="font-weight: 500; margin-bottom: var(--space-md);">You have attempted to switch tabs or leave the quiz window. This is strictly prohibited.</p>
+          <div style="background: var(--rose-50); padding: var(--space-md); border-radius: 8px; margin-bottom: var(--space-lg); border-left: 4px solid var(--rose-500);">
+            <p style="color: var(--rose-700); font-size: 0.9rem; font-weight: 600;">
+              Warning: Your quiz will be automatically submitted on the 3rd attempt.
+            </p>
+          </div>
+          <button class="btn btn-primary" id="ack-violation" style="width:100%;">I Understand, Continue Quiz</button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      document.getElementById('ack-violation').addEventListener('click', () => {
+        overlay.remove();
+        requestFullscreen();
+      });
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) recordViolation('tab_switch');
+    };
+
     const handleBlur = () => {
-      // Blur can happen if they click outside the browser or open a new window
-      tabSwitches++;
-      if (tabSwitches >= 3) {
-        showToast(`🚫 Quiz auto-submitted! Focus lost 3 times.`, 'error');
-        submitQuiz();
-      } else {
-        showToast(`⚠️ Warning: Focus lost! (Attempt ${tabSwitches}/3). Stay on this page.`, 'warning');
-      }
+      recordViolation('focus_lost');
     };
 
     const handleBeforeUnload = (e) => {
@@ -139,7 +162,7 @@ export async function renderQuiz(quizId) {
     window.addEventListener('blur', handleBlur);
     window.addEventListener('beforeunload', handleBeforeUnload);
     
-    // Try to enter fullscreen (might fail if not direct user action, but we are in an async function started by a click)
+    // Try to enter fullscreen
     requestFullscreen();
 
     function renderQuestion() {

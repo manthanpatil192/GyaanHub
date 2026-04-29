@@ -206,8 +206,8 @@ export async function renderQuizResults(quizId) {
                     <tr>
                       <td>${i + 1}</td>
                       <td>
-                        <div style="font-weight:600;">${r.student_name}</div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);">@${r.student_username}</div>
+                        <div style="font-weight:600;">${r.users?.full_name || 'Unknown'}</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">@${r.users?.username || 'unknown'}</div>
                       </td>
                       <td>${r.score}/${r.total_points}</td>
                       <td><span class="badge badge-${color}">${pct}%</span></td>
