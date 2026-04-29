@@ -60,22 +60,62 @@ class LocalDB {
         };
         return builder;
       },
-      insert: (rows) => ({
-        select: () => ({
-          single: () => this._insert(table, rows)
-        })
-      }),
-      upsert: (rows) => ({
-        select: () => ({
-          single: () => this._upsert(table, rows)
-        })
-      }),
-      update: (updates) => ({
-        eq: (col, val) => this._update(table, col, val, updates)
-      }),
-      delete: () => ({
-        eq: (col, val) => this._delete(table, col, val)
-      })
+      insert: (rows) => {
+        const builder = {
+          select: () => builder,
+          single: async () => await this._insert(table, rows),
+          then: async (cb) => {
+            const res = await this._insert(table, rows);
+            return cb(res);
+          }
+        };
+        return builder;
+      },
+      upsert: (rows) => {
+        const builder = {
+          select: () => builder,
+          single: async () => await this._upsert(table, rows),
+          then: async (cb) => {
+            const res = await this._upsert(table, rows);
+            return cb(res);
+          }
+        };
+        return builder;
+      },
+      update: (updates) => {
+        let eqCol, eqVal;
+        const builder = {
+          eq: (col, val) => {
+            eqCol = col;
+            eqVal = val;
+            return builder;
+          },
+          select: () => builder,
+          single: async () => await this._update(table, eqCol, eqVal, updates),
+          then: async (cb) => {
+            const res = await this._update(table, eqCol, eqVal, updates);
+            return cb(res);
+          }
+        };
+        return builder;
+      },
+      delete: () => {
+        let eqCol, eqVal;
+        const builder = {
+          eq: (col, val) => {
+            eqCol = col;
+            eqVal = val;
+            return builder;
+          },
+          select: () => builder,
+          single: async () => await this._delete(table, eqCol, eqVal),
+          then: async (cb) => {
+            const res = await this._delete(table, eqCol, eqVal);
+            return cb(res);
+          }
+        };
+        return builder;
+      }
     };
   }
 
