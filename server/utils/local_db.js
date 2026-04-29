@@ -100,7 +100,43 @@ class LocalDB {
       });
     }
 
+    // Enrich data to simulate Supabase JOINs
+    rows = this._enrichData(table, rows, data);
+
     return { data: rows, error: null };
+  }
+
+  _enrichData(table, rows, data) {
+    if (table === 'quizzes') {
+      return rows.map(r => ({
+        ...r,
+        questions: (data['questions'] || []).filter(q => q.quiz_id === r.id),
+        quiz_attempts: (data['quiz_attempts'] || []).filter(a => a.quiz_id === r.id),
+        modules: (data['modules'] || []).find(m => m.id === r.module_id) || null,
+        users: (data['users'] || []).find(u => u.id === r.created_by) || null
+      }));
+    }
+    if (table === 'quiz_attempts') {
+      return rows.map(r => ({
+        ...r,
+        answers: (data['answers'] || []).filter(a => a.attempt_id === r.id),
+        quizzes: (data['quizzes'] || []).find(q => q.id === r.quiz_id) || null,
+        users: (data['users'] || []).find(u => u.id === r.student_id) || null
+      }));
+    }
+    if (table === 'answers') {
+      return rows.map(r => ({
+        ...r,
+        questions: (data['questions'] || []).find(q => q.id === r.question_id) || null
+      }));
+    }
+    if (table === 'users') {
+      return rows.map(r => ({
+        ...r,
+        quiz_attempts: (data['quiz_attempts'] || []).filter(a => a.student_id === r.id)
+      }));
+    }
+    return rows;
   }
 
   async _insert(table, rows) {
