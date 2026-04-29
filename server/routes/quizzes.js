@@ -199,7 +199,7 @@ router.post('/:id/start', authenticate, requireRole('student'), async (req, res)
 // Submit quiz
 router.post('/:id/submit', authenticate, requireRole('student'), async (req, res) => {
   try {
-    const { attempt_id, answers: submittedAnswers } = req.body;
+    const { attempt_id, answers: submittedAnswers, tab_switches } = req.body;
 
     const attempt = db.findOne('quiz_attempts', a => 
       a.id === attempt_id && 
@@ -244,7 +244,8 @@ router.post('/:id/submit', authenticate, requireRole('student'), async (req, res
       completed_at: new Date().toISOString(),
       score,
       time_taken_seconds: timeTaken,
-      status: 'completed'
+      status: 'completed',
+      tab_switches: tab_switches || 0
     });
 
     // 5. Get detailed answers for feedback

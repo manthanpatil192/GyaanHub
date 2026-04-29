@@ -190,6 +190,7 @@ export async function renderQuizResults(quizId) {
                   <th>Student</th>
                   <th>Score</th>
                   <th>Percentage</th>
+                  <th>Tab Switches</th>
                   <th>Time Taken</th>
                   <th>Date</th>
                 </tr>
@@ -200,6 +201,7 @@ export async function renderQuizResults(quizId) {
                   const color = pct >= 80 ? 'emerald' : pct >= 50 ? 'amber' : 'rose';
                   const mins = Math.floor(r.time_taken_seconds / 60);
                   const secs = r.time_taken_seconds % 60;
+                  const switches = r.tab_switches || 0;
                   return `
                     <tr>
                       <td>${i + 1}</td>
@@ -209,6 +211,11 @@ export async function renderQuizResults(quizId) {
                       </td>
                       <td>${r.score}/${r.total_points}</td>
                       <td><span class="badge badge-${color}">${pct}%</span></td>
+                      <td>
+                        <span class="badge ${switches > 0 ? 'badge-rose' : 'badge-emerald'}" title="${switches > 0 ? 'Potential cheating detected' : 'No tab switches detected'}">
+                          ${switches > 0 ? `⚠️ ${switches} switches` : 'None'}
+                        </span>
+                      </td>
                       <td>${mins}:${secs.toString().padStart(2, '0')}</td>
                       <td style="font-size:0.8rem;color:var(--text-muted);">${formatDate(r.completed_at)}</td>
                     </tr>

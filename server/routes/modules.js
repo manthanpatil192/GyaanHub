@@ -6,7 +6,7 @@ import { authenticate, requireRole } from '../middleware/auth.js';
 const router = Router();
 
 // Get all modules
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
   try {
     const modules = db.findAll('modules');
     const enriched = modules.map(m => ({
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get single module
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, async (req, res) => {
   try {
     const mod = db.findOne('modules', m => m.id === req.params.id);
     if (!mod) return res.status(404).json({ error: 'Module not found' });
@@ -46,16 +46,14 @@ router.post('/', authenticate, requireRole('teacher'), async (req, res) => {
       return res.status(400).json({ error: 'Title, description, content, category, and difficulty required' });
     }
 
-    const { data: mod, error } = await supabase
-      .from('modules')
-      .insert([{
-        title, description, content, category, difficulty,
-        icon: icon || '📚', created_by: req.user.id
-      }])
-      .select()
-      .single();
+    const mod = db.insert('modules', {
+      id: uuid(),
+      title, description, content, category, difficulty,
+      icon: icon || '📚', 
+      created_by: req.user.id,
+      created_at: new Date().toISOString()
+    });
 
-    if (error) throw error;
     res.status(201).json(mod);
   } catch (err) {
     console.error('Create module error:', err);
@@ -71,16 +69,10 @@ router.put('/:id', authenticate, requireRole('teacher'), async (req, res) => {
       if (req.body[key] !== undefined) updates[key] = req.body[key];
     }
 
-    const { data: updated, error } = await supabase
-      .from('modules')
-      .update(updates)
-      .eq('id', req.params.id)
-      .select()
-      .single();
+    const updated = db.update('modules', m => m.id === req.params.id, updates);
 
-    if (error) {
-      if (error.code === 'PGRST116') return res.status(404).json({ error: 'Module not found' });
-      throw error;
+    if (!updated) {
+      return res.status(404).json({ error: 'Module not found' });
     }
 
     res.json(updated);
@@ -93,12 +85,12 @@ router.put('/:id', authenticate, requireRole('teacher'), async (req, res) => {
 // Delete module
 router.delete('/:id', authenticate, requireRole('teacher'), async (req, res) => {
   try {
-    const { error } = await supabase
-      .from('modules')
-      .delete()
-      .eq('id', req.params.id);
+    const deletedCount = db.delete('modules', m => m.id === req.params.id);
 
-    if (error) throw error;
+    if (deletedCount === 0) {
+      return res.status(404).json({ error: 'Module not found' });
+    }
+
     res.json({ message: 'Module deleted successfully' });
   } catch (err) {
     console.error('Delete module error:', err);

@@ -31,6 +31,11 @@ export async function request(path, options = {}) {
     }
 
     if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.hash = '/login';
+      }
       throw new Error(data.error || data.message || 'Something went wrong');
     }
 
@@ -87,9 +92,9 @@ export const quizzes = {
   }),
   delete: (id) => request(`/quizzes/${id}`, { method: 'DELETE' }),
   start: (id) => request(`/quizzes/${id}/start`, { method: 'POST' }),
-  submit: (id, attemptId, answers) => request(`/quizzes/${id}/submit`, {
+  submit: (id, attemptId, answers, tabSwitches = 0) => request(`/quizzes/${id}/submit`, {
     method: 'POST',
-    body: JSON.stringify({ attempt_id: attemptId, answers })
+    body: JSON.stringify({ attempt_id: attemptId, answers, tab_switches: tabSwitches })
   }),
   bulkImport: (data) => request('/quizzes/bulk-import', {
     method: 'POST',

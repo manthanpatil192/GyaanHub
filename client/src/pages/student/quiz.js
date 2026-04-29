@@ -93,6 +93,55 @@ export async function renderQuiz(quizId) {
     const endTime = startTime + timeLimitMs;
     let remainingSeconds = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
 
+    let tabSwitches = 0;
+    let isSubmitting = false;
+
+    // Request fullscreen on start (must be triggered by user interaction)
+    const requestFullscreen = () => {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        tabSwitches++;
+        if (tabSwitches >= 3) {
+          showToast(`🚫 Quiz auto-submitted! Maximum tab switches (3) exceeded.`, 'error');
+          submitQuiz();
+        } else {
+          showToast(`⚠️ Warning: Tab switch detected! (Attempt ${tabSwitches}/3). Quiz will auto-submit on 3rd attempt.`, 'error');
+        }
+      }
+    };
+
+    const handleBlur = () => {
+      // Blur can happen if they click outside the browser or open a new window
+      tabSwitches++;
+      if (tabSwitches >= 3) {
+        showToast(`🚫 Quiz auto-submitted! Focus lost 3 times.`, 'error');
+        submitQuiz();
+      } else {
+        showToast(`⚠️ Warning: Focus lost! (Attempt ${tabSwitches}/3). Stay on this page.`, 'warning');
+      }
+    };
+
+    const handleBeforeUnload = (e) => {
+      if (!isSubmitting) {
+        e.preventDefault();
+        e.returnValue = 'Are you sure you want to quit the quiz? Your progress may not be saved.';
+      }
+    };
+
+    // Initialize strict mode
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    // Try to enter fullscreen (might fail if not direct user action, but we are in an async function started by a click)
+    requestFullscreen();
+
     function renderQuestion() {
       const q = questions[currentQuestion];
       const selectedOption = answers[q.id] || null;
@@ -241,6 +290,14 @@ export async function renderQuiz(quizId) {
 
     async function submitQuiz() {
       if (timerInterval) clearInterval(timerInterval);
+      
+      isSubmitting = true;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+
+      // Exit fullscreen if possible
+      if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
 
       const submitAnswers = questions.map(q => ({
         question_id: q.id,
@@ -251,9 +308,14 @@ export async function renderQuiz(quizId) {
         const main = document.querySelector('.layout-content');
         if (main) main.innerHTML = `<div class="loading-spinner"><div class="spinner"></div></div>`;
 
-        const result = await quizzesApi.submit(quizId, attempt.id, submitAnswers);
+        const result = await quizzesApi.submit(quizId, attempt.id, submitAnswers, tabSwitches);
         navigate(`/student/result/${attempt.id}`);
       } catch (err) {
+        isSubmitting = false; // Allow retrying or fixing
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('blur', handleBlur);
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        
         showToast('Error submitting quiz: ' + err.message, 'error');
         renderQuestion();
       }
