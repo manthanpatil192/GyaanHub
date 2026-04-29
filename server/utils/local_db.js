@@ -23,6 +23,7 @@ class LocalDB {
   // Mocking the Supabase builder pattern
   from(table) {
     let filters = [];
+    let sortConfig = null;
     return {
       select: (query = '*') => {
         const builder = {
@@ -31,26 +32,29 @@ class LocalDB {
             return builder;
           },
           or: (queryStr) => {
-            // Very basic parser for "col1.eq.val1,col2.eq.val2"
             const parts = queryStr.split(',');
             filters.push((r) => {
               return parts.some(p => {
                 const [c, op, v] = p.split('.');
-                return r[c] === v;
+                return String(r[c]) === String(v);
               });
             });
             return builder;
           },
+          order: (col, options = { ascending: true }) => {
+            sortConfig = { col, ascending: options.ascending };
+            return builder;
+          },
           single: async () => {
-            const { data } = await this._execute(table, filters);
+            const { data } = await this._execute(table, filters, sortConfig);
             return { data: data[0] || null, error: null };
           },
           maybeSingle: async () => {
-            const { data } = await this._execute(table, filters);
+            const { data } = await this._execute(table, filters, sortConfig);
             return { data: data[0] || null, error: null };
           },
           then: async (cb) => {
-            const res = await this._execute(table, filters);
+            const res = await this._execute(table, filters, sortConfig);
             return cb(res);
           }
         };
@@ -75,12 +79,27 @@ class LocalDB {
     };
   }
 
-  async _execute(table, filters) {
+  async _execute(table, filters, sortConfig) {
     const data = await this.getData();
     let rows = data[table] || [];
     filters.forEach(f => {
       rows = rows.filter(f);
     });
+
+    if (sortConfig) {
+      const { col, ascending } = sortConfig;
+      rows.sort((a, b) => {
+        let valA = a[col];
+        let valB = b[col];
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+        
+        if (valA < valB) return ascending ? -1 : 1;
+        if (valA > valB) return ascending ? 1 : -1;
+        return 0;
+      });
+    }
+
     return { data: rows, error: null };
   }
 
