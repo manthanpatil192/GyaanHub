@@ -2791,16 +2791,6 @@
       "module_id": "m-sec-002",
       "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
       "created_at": "2026-04-29T14:54:46.230Z"
-    },
-    {
-      "id": "2457c936-3191-4f53-a2fb-ff965e4612c0",
-      "title": "journal",
-      "description": "Uploaded file: DBMS lab journal contents.pdf",
-      "type": "pdf",
-      "url": "/uploads/2457c936-3191-4f53-a2fb-ff965e4612c0.pdf",
-      "module_id": "b0754b49-593a-40da-ba4c-9a463a33efff",
-      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
-      "created_at": "2026-04-29T17:09:42.817Z"
     }
   ],
   "er_diagrams": [],
