@@ -1,0 +1,25 @@
+DBMS MASTER CHEAT SHEET
+======================
+
+1. ACID PROPERTIES:
+   - Atomicity
+   - Consistency
+   - Isolation
+   - Durability
+
+2. SQL COMMANDS:
+   - SELECT * FROM users;
+   - CREATE TABLE modules (...);
+
+3. NORMALIZATION:
+   - 1NF: Atomic values
+   - 2NF: No partial dependency
+   - 3NF: No transitive dependency
+
+4. ER DIAGRAMS:
+   - Entity (Rectangle)
+   - Attribute (Ellipse)
+   - Relationship (Diamond)
+
+---
+GyaanHub Presentation Ready.

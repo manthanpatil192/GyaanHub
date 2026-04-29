@@ -98,7 +98,7 @@ router.post('/', authenticate, requireRole('teacher'), async (req, res) => {
   }
 });
 
-// Upload PDF/PPT file to Supabase Cloud Storage
+// Upload PDF/PPT file to LOCAL Storage
 router.post('/upload', authenticate, requireRole('teacher'), upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
@@ -107,33 +107,20 @@ router.post('/upload', authenticate, requireRole('teacher'), upload.single('file
 
     const { title, description, module_id, type, price } = req.body;
     
-    // 1. Ensure bucket exists (using service role bypasses most RLS issues)
-    const { data: bucket, error: bucketError } = await supabase.storage.getBucket('materials');
-    if (bucketError && bucketError.message.includes('not found')) {
-      await supabase.storage.createBucket('materials', { public: true });
-    }
-
-    // 2. Generate unique filename
+    // 1. Generate unique filename
+    const fs = await import('fs/promises');
     const ext = path.extname(req.file.originalname).toLowerCase();
     const fileName = `${uuid()}${ext}`;
+    const filePath = path.join(uploadsDir, fileName);
 
-    // 3. Upload to Supabase Storage
-    const { data: storageData, error: storageError } = await supabase.storage
-      .from('materials')
-      .upload(fileName, req.file.buffer, {
-        contentType: req.file.mimetype,
-        cacheControl: '3600',
-        upsert: false
-      });
+    // 2. Save to local disk
+    await fs.writeFile(filePath, req.file.buffer);
 
-    if (storageError) throw storageError;
+    // 3. Generate Local URL
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const localUrl = `/uploads/${fileName}`;
 
-    // 4. Get Public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('materials')
-      .getPublicUrl(fileName);
-
-    // 5. Save metadata to DB
+    // 4. Save metadata to DB
     const { data: newMaterial, error: dbError } = await supabase
       .from('materials')
       .insert([{
@@ -141,7 +128,7 @@ router.post('/upload', authenticate, requireRole('teacher'), upload.single('file
         description: description || `Uploaded file: ${req.file.originalname}`,
         type: type || 'pdf',
         price: parseFloat(price) || 0,
-        url: publicUrl,
+        url: localUrl,
         module_id: module_id || null,
         created_by: req.user.id
       }])
@@ -149,6 +136,13 @@ router.post('/upload', authenticate, requireRole('teacher'), upload.single('file
       .single();
 
     if (dbError) throw dbError;
+
+    res.status(201).json(newMaterial);
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
     res.status(201).json(newMaterial);
   } catch (err) {
     console.error('Upload material error:', err);
