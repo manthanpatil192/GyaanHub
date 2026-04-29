@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -182,7 +183,18 @@ class LocalDB {
   async _insert(table, rows) {
     const data = await this.getData();
     if (!data[table]) data[table] = [];
-    const newRows = Array.isArray(rows) ? rows : [rows];
+    
+    // Auto-generate IDs and timestamps to mimic Supabase defaults
+    const newRows = (Array.isArray(rows) ? rows : [rows]).map(row => {
+      const now = new Date().toISOString();
+      return {
+        id: row.id || crypto.randomUUID(),
+        created_at: row.created_at || now,
+        started_at: row.started_at || (table === 'quiz_attempts' ? now : undefined),
+        ...row
+      };
+    });
+
     data[table].push(...newRows);
     await this.saveData(data);
     return { data: newRows[0], error: null };
