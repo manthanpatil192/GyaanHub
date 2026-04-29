@@ -55,6 +55,34 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// TEMPORARY: Auto-Migration Endpoint for Presentation
+app.get('/api/admin/migrate-all', async (req, res) => {
+  try {
+    const fs = await import('fs');
+    const data = JSON.parse(fs.readFileSync('./db/data.json', 'utf8'));
+    
+    // 1. Users
+    if (data.users) await supabase.from('users').upsert(data.users);
+    // 2. Modules
+    if (data.modules) await supabase.from('modules').upsert(data.modules);
+    // 3. Quizzes
+    if (data.quizzes) await supabase.from('quizzes').upsert(data.quizzes);
+    // 4. Questions
+    if (data.questions) {
+      for (let i = 0; i < data.questions.length; i += 50) {
+        await supabase.from('questions').upsert(data.questions.slice(i, i + 50));
+      }
+    }
+    // 5. Materials
+    if (data.materials) await supabase.from('materials').upsert(data.materials);
+    
+    res.json({ success: true, message: 'All data pushed directly to Mumbai!' });
+  } catch (err) {
+    console.error('Migration error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Admin DB Dump for Presentation (Supabase)
 app.get('/api/admin/dump', async (req, res) => {
   try {
