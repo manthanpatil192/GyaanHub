@@ -1,0 +1,129 @@
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_PATH = path.join(__dirname, '../db/data.json');
+
+/**
+ * Local DB Utility that mimics Supabase's basic behavior 
+ * by reading and writing to data.json
+ */
+class LocalDB {
+  async getData() {
+    const content = await fs.readFile(DATA_PATH, 'utf-8');
+    return JSON.parse(content);
+  }
+
+  async saveData(data) {
+    await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2));
+  }
+
+  // Mocking the Supabase builder pattern
+  from(table) {
+    let filters = [];
+    return {
+      select: (query = '*') => {
+        const builder = {
+          eq: (col, val) => {
+            filters.push((r) => r[col] === val);
+            return builder;
+          },
+          or: (queryStr) => {
+            // Very basic parser for "col1.eq.val1,col2.eq.val2"
+            const parts = queryStr.split(',');
+            filters.push((r) => {
+              return parts.some(p => {
+                const [c, op, v] = p.split('.');
+                return r[c] === v;
+              });
+            });
+            return builder;
+          },
+          single: async () => {
+            const { data } = await this._execute(table, filters);
+            return { data: data[0] || null, error: null };
+          },
+          maybeSingle: async () => {
+            const { data } = await this._execute(table, filters);
+            return { data: data[0] || null, error: null };
+          },
+          then: async (cb) => {
+            const res = await this._execute(table, filters);
+            return cb(res);
+          }
+        };
+        return builder;
+      },
+      insert: (rows) => ({
+        select: () => ({
+          single: () => this._insert(table, rows)
+        })
+      }),
+      upsert: (rows) => ({
+        select: () => ({
+          single: () => this._upsert(table, rows)
+        })
+      }),
+      update: (updates) => ({
+        eq: (col, val) => this._update(table, col, val, updates)
+      }),
+      delete: () => ({
+        eq: (col, val) => this._delete(table, col, val)
+      })
+    };
+  }
+
+  async _execute(table, filters) {
+    const data = await this.getData();
+    let rows = data[table] || [];
+    filters.forEach(f => {
+      rows = rows.filter(f);
+    });
+    return { data: rows, error: null };
+  }
+
+  async _insert(table, rows) {
+    const data = await this.getData();
+    if (!data[table]) data[table] = [];
+    const newRows = Array.isArray(rows) ? rows : [rows];
+    data[table].push(...newRows);
+    await this.saveData(data);
+    return { data: newRows[0], error: null };
+  }
+
+  async _upsert(table, rows) {
+    const data = await this.getData();
+    if (!data[table]) data[table] = [];
+    const items = Array.isArray(rows) ? rows : [rows];
+    items.forEach(item => {
+      const idx = data[table].findIndex(r => r.id === item.id);
+      if (idx > -1) data[table][idx] = { ...data[table][idx], ...item };
+      else data[table].push(item);
+    });
+    await this.saveData(data);
+    return { data: items[0], error: null };
+  }
+
+  async _update(table, col, val, updates) {
+    const data = await this.getData();
+    const rows = data[table] || [];
+    rows.forEach((r, idx) => {
+      if (r[col] === val) data[table][idx] = { ...r, ...updates };
+    });
+    await this.saveData(data);
+    return { data: null, error: null };
+  }
+
+  async _delete(table, col, val) {
+    const data = await this.getData();
+    if (data[table]) {
+      data[table] = data[table].filter(r => r[col] !== val);
+      await this.saveData(data);
+    }
+    return { data: null, error: null };
+  }
+}
+
+export const localDB = new LocalDB();

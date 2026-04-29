@@ -103,6 +103,28 @@
       "icon": "⚡",
       "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
       "created_at": "2026-04-14T06:38:20.422Z"
+    },
+    {
+      "id": "m-nosql-001",
+      "title": "NoSQL Databases",
+      "description": "Explore MongoDB, Redis, and Cassandra. Learn when to use NoSQL vs SQL.",
+      "content": "# NoSQL Databases\n\n## Types of NoSQL\n1. **Document Stores** (MongoDB)\n2. **Key-Value Pairs** (Redis)\n3. **Column Family** (Cassandra)\n4. **Graph Databases** (Neo4j)",
+      "category": "Advanced",
+      "difficulty": "intermediate",
+      "icon": "🍃",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-29T14:54:46.229Z"
+    },
+    {
+      "id": "m-sec-002",
+      "title": "Database Security",
+      "description": "Learn about SQL Injection, Encryption, and Role-Based Access Control.",
+      "content": "# Database Security\n\n## Threats\n- **SQL Injection**: Malicious queries\n- **Unauthorized Access**: Weak passwords\n\n## Defense\n- **Prepared Statements**\n- **Hashing** (bcrypt)\n- **TLS/SSL Encryption**",
+      "category": "Security",
+      "difficulty": "advanced",
+      "icon": "🛡️",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-29T14:54:46.230Z"
     }
   ],
   "quizzes": [
@@ -193,6 +215,17 @@
       "is_active": true,
       "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
       "created_at": "2026-04-15T15:16:35.214Z"
+    },
+    {
+      "id": "q-security-101",
+      "title": "Database Security Challenge",
+      "description": "Test your ability to secure a database against common attacks.",
+      "module_id": "m-sec-002",
+      "time_limit_minutes": 15,
+      "total_points": 5,
+      "is_active": 1,
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-29T14:54:46.230Z"
     }
   ],
   "questions": [
@@ -1001,6 +1034,32 @@
       "explanation": "",
       "points": 1,
       "sort_order": 8
+    },
+    {
+      "id": "qs-1",
+      "quiz_id": "q-security-101",
+      "question_text": "Which is the best way to prevent SQL Injection?",
+      "option_a": "Using regex filters",
+      "option_b": "Escaping strings manually",
+      "option_c": "Using Prepared Statements",
+      "option_d": "Disabling the database",
+      "correct_option": "C",
+      "explanation": "Prepared statements (Parameterized queries) separate code from data.",
+      "points": 1,
+      "sort_order": 1
+    },
+    {
+      "id": "qs-2",
+      "quiz_id": "q-security-101",
+      "question_text": "What does RBAC stand for?",
+      "option_a": "Random Based Access Control",
+      "option_b": "Role Based Access Control",
+      "option_c": "Row Based Access Control",
+      "option_d": "Rules Based Access Control",
+      "correct_option": "B",
+      "explanation": "Role Based Access Control assigns permissions to roles, not users.",
+      "points": 1,
+      "sort_order": 2
     }
   ],
   "quiz_attempts": [
@@ -2297,6 +2356,29 @@
       "module_id": "b0754b49-593a-40da-ba4c-9a463a33efff",
       "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
       "created_at": "2026-04-15T16:02:16.985Z"
+    },
+    {
+      "id": "vid-nosql-intro",
+      "title": "NoSQL Explained in 10 Minutes",
+      "description": "A fast-paced guide to NoSQL architectures.",
+      "type": "video",
+      "url": "https://www.youtube.com/embed/0buKQHokLK8",
+      "thumbnail": "https://img.youtube.com/vi/0buKQHokLK8/maxresdefault.jpg",
+      "price": 0,
+      "module_id": "m-nosql-001",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-29T14:54:46.230Z"
+    },
+    {
+      "id": "ppt-security-master",
+      "title": "Advanced DB Security Slides",
+      "description": "Interactive slides on securing your backend.",
+      "type": "ppt",
+      "url": "#",
+      "slides": "[{\"title\":\"Security Overview\",\"bullets\":[\"Authentication\",\"Authorization\",\"Auditing\"]},{\"title\":\"SQL Injection\",\"bullets\":[\"How it works\",\"How to prevent it\",\"Example payloads\"]}]",
+      "module_id": "m-sec-002",
+      "created_by": "8420d143-cf7f-4421-a083-2620864cbe2c",
+      "created_at": "2026-04-29T14:54:46.230Z"
     }
   ],
   "er_diagrams": [],

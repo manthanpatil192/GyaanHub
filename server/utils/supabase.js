@@ -1,13 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
+import { localDB } from './local_db.js';
 
-dotenv.config();
+// MASTER SWITCH: Use Local DB for 100% reliability during presentation
+// To switch back to Supabase Cloud, replace this with the original createClient logic
+export const supabase = localDB;
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  console.warn('⚠️ Supabase credentials missing in .env');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseKey);
+console.log('🚀 GyaanHub is running in LOCAL DATABASE MODE');
