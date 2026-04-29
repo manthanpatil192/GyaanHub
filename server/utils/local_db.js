@@ -28,7 +28,7 @@ class LocalDB {
       select: (query = '*') => {
         const builder = {
           eq: (col, val) => {
-            filters.push((r) => r[col] === val);
+            filters.push((r) => r[col] == val); // Loose equality for true/1
             return builder;
           },
           or: (queryStr) => {
