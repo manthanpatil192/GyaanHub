@@ -49,7 +49,7 @@ import { supabase } from './utils/supabase.js';
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ 
-    status: 'ok', 
+    status: 'ok-migrated', 
     supabase_configured: !!process.env.SUPABASE_URL,
     timestamp: new Date().toISOString() 
   });
