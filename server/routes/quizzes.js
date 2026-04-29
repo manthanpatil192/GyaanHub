@@ -189,10 +189,29 @@ router.post('/:id/start', authenticate, requireRole('student'), async (req, res)
       .maybeSingle();
 
     if (attempt) {
-      const safeQuestions = quiz.questions
-        .sort((a, b) => a.sort_order - b.sort_order)
-        .map(({ correct_option, explanation, ...q }) => q);
-      return res.json({ attempt, quiz, questions: safeQuestions, savedAnswers: attempt.answers || [] });
+      // Check if attempt is stale/expired
+      const startTime = new Date(attempt.started_at).getTime();
+      const timeLimitMs = (quiz.time_limit_minutes || 10) * 60 * 1000;
+      const isExpired = Date.now() > (startTime + timeLimitMs + 5000); // 5s buffer
+
+      if (isExpired) {
+        // Mark stale attempt as completed so we can start a new one
+        await supabase
+          .from('quiz_attempts')
+          .update({ 
+            status: 'completed', 
+            completed_at: new Date().toISOString(),
+            score: 0 // No score for stale attempts
+          })
+          .eq('id', attempt.id);
+        
+        // Don't return this attempt, let it fall through to create a new one
+      } else {
+        const safeQuestions = quiz.questions
+          .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+          .map(({ correct_option, explanation, ...q }) => q);
+        return res.json({ attempt, quiz, questions: safeQuestions, savedAnswers: attempt.answers || [] });
+      }
     }
 
     // Create new attempt
