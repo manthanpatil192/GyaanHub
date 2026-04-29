@@ -177,6 +177,14 @@ class LocalDB {
         quiz_attempts: (data['quiz_attempts'] || []).filter(a => a.student_id === r.id)
       }));
     }
+    if (table === 'materials') {
+      return rows.map(r => ({
+        ...r,
+        purchases: (data['purchases'] || []).filter(p => p.material_id === r.id),
+        modules: (data['modules'] || []).find(m => m.id === r.module_id) || null,
+        users: (data['users'] || []).find(u => u.id === r.created_by) || null
+      }));
+    }
     return rows;
   }
 
