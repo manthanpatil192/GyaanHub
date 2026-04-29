@@ -143,12 +143,6 @@ router.post('/upload', authenticate, requireRole('teacher'), upload.single('file
     res.status(500).json({ error: err.message });
   }
 });
-    res.status(201).json(newMaterial);
-  } catch (err) {
-    console.error('Upload material error:', err);
-    res.status(500).json({ error: err.message || 'Internal server error' });
-  }
-});
 
 // Record a purchase
 router.post('/purchase', authenticate, async (req, res) => {
