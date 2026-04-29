@@ -28,8 +28,8 @@ router.get('/', authenticate, async (req, res) => {
       ...q,
       creator_name: q.users?.full_name || 'Unknown',
       module_title: q.modules?.title || null,
-      question_count: q.questions?.[0]?.count || 0,
-      attempt_count: q.quiz_attempts?.[0]?.count || 0
+      question_count: q.questions?.length || 0,
+      attempt_count: q.quiz_attempts?.length || 0
     }));
 
     res.json(enriched);
