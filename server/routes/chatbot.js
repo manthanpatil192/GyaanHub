@@ -1,96 +1,67 @@
 import express from 'express';
-import https from 'https';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_PATH = path.join(__dirname, '../db/data.json');
 
 const router = express.Router();
 
-// Helper to mask API key for logging
-const maskKey = (key) => key ? `${key.slice(0, 4)}...${key.slice(-4)}` : 'MISSING';
-
 router.get('/status', (req, res) => {
-  const apiKey = process.env.GROQ_API_KEY;
   res.json({
     status: 'ok',
-    mode: 'Cloud AI (Groq)',
-    apiKeyConfigured: !!apiKey,
-    apiKeyPreview: maskKey(apiKey),
-    engine: 'llama-3.1-8b-instant via Groq'
+    mode: 'Local Expert (Offline)',
+    apiKeyConfigured: true,
+    apiKeyPreview: 'OFFLINE_MODE',
+    engine: 'DBMS Knowledge Base (Local)'
   });
 });
 
-router.post('/ask', async (req, res) => {
-  const { message, history } = req.body;
+router.post('/ask', (req, res) => {
+  const { message } = req.body;
 
   if (!message) return res.status(400).json({ error: 'Message is required' });
 
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'GROQ_API_KEY is not configured on the server. Please add it to your .env file.' });
-  }
-
+  const query = message.toLowerCase();
+  
   try {
-    const messages = [];
-    messages.push({ role: "system", content: "You are a helpful and expert DBMS tutor for university students. Be highly concise, engaging, and professional. Focus on database concepts." });
+    const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
+    let reply = "I'm your Local DBMS Expert! Please ask me about topics like Normalization, ACID properties, SQL, or ER Diagrams.";
     
-    if (history) {
-      history.forEach(msg => {
-        messages.push({ role: msg.role === 'model' ? 'assistant' : 'user', content: msg.text || '' });
-      });
+    // Basic Keyword Search in Modules
+    if (data.modules && Array.isArray(data.modules)) {
+      for (const module of data.modules) {
+        if (query.includes(module.title.toLowerCase()) || 
+            module.description.toLowerCase().includes(query)) {
+          reply = `Here is some information about **${module.title}**:\n\n${module.description}\n\nYou can learn more by visiting the Study Materials section!`;
+          break;
+        }
+      }
     }
 
-    messages.push({ role: 'user', content: message });
+    // Specific hardcoded responses for common DBMS terms to make it feel smart
+    if (query.includes('acid')) {
+      reply = "**ACID Properties** stand for:\n- **Atomicity**: All or nothing.\n- **Consistency**: Data remains valid.\n- **Isolation**: Transactions don't interfere.\n- **Durability**: Changes are permanent.";
+    } else if (query.includes('normaliz') || query.includes('1nf') || query.includes('2nf') || query.includes('3nf')) {
+      reply = "**Normalization** is organizing data to reduce redundancy.\n- **1NF**: Atomic values.\n- **2NF**: No partial dependencies.\n- **3NF**: No transitive dependencies.\n- **BCNF**: Stricter 3NF.";
+    } else if (query.includes('sql') || query.includes('select') || query.includes('join')) {
+      reply = "**SQL (Structured Query Language)** is used to manage relational databases.\nKey commands include SELECT, INSERT, UPDATE, DELETE, and JOINs (Inner, Left, Right, Full).";
+    } else if (query.includes('er diagram') || query.includes('entity')) {
+      reply = "**ER Diagrams (Entity-Relationship)** visualize data.\n- **Entities** (Rectangles): Objects like 'Student'.\n- **Attributes** (Ellipses): Properties like 'Name'.\n- **Relationships** (Diamonds): Connections like 'Enrolled'.";
+    } else if (query.includes('hi') || query.includes('hello')) {
+      reply = "Hello! I am your Local DBMS Expert. How can I help you with database concepts today?";
+    }
 
-    const postData = JSON.stringify({
-      model: "llama-3.1-8b-instant",
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 500
-    });
-
-    const options = {
-      hostname: 'api.groq.com',
-      port: 443,
-      path: '/openai/v1/chat/completions',
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
-      },
-      timeout: 15000 
-    };
-
-    const reqPost = https.request(options, (resPost) => {
-      let dataChunks = '';
-      resPost.on('data', (chunk) => { dataChunks += chunk; });
-      resPost.on('end', () => {
-        try {
-          const data = JSON.parse(dataChunks);
-          if (resPost.statusCode !== 200) {
-            console.error("Groq API Error:", data);
-            return res.status(500).json({ error: data.error?.message || 'Chatbot encountered an error from Groq.' });
-          }
-          const reply = data.choices?.[0]?.message?.content || "I'm not sure how to respond.";
-          res.json({ reply, source: 'groq' });
-        } catch (e) {
-          res.status(500).json({ error: "Failed to parse AI response." });
-        }
-      });
-    });
-
-    reqPost.on('error', () => {
-      res.status(502).json({ error: "Oops! I encountered a network error. Please try again." });
-    });
-
-    reqPost.on('timeout', () => {
-      reqPost.destroy();
-      res.status(504).json({ error: "That took a bit too long to process. Can we try a simpler database question?" });
-    });
-
-    reqPost.write(postData);
-    reqPost.end();
+    // Simulate slight delay for realism
+    setTimeout(() => {
+      res.json({ reply, source: 'local_expert' });
+    }, 800);
 
   } catch (err) {
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Local Expert Error:', err);
+    res.status(500).json({ error: "Failed to access local knowledge base." });
   }
 });
 
