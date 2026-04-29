@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import { v4 as uuid } from 'uuid';
-import db from '../db/schema.js';
+import { supabase } from '../utils/supabase.js';
 import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
@@ -8,7 +7,13 @@ const router = Router();
 // Get all diagrams for a user
 router.get('/', authenticate, async (req, res) => {
   try {
-    const diagrams = db.findAll('er_diagrams', d => d.user_id === req.user.id);
+    const { data: diagrams, error } = await supabase
+      .from('er_diagrams')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .order('updated_at', { ascending: false });
+
+    if (error) throw error;
     res.json(diagrams);
   } catch (err) {
     console.error('Get diagrams error:', err);
@@ -19,8 +24,13 @@ router.get('/', authenticate, async (req, res) => {
 // Get single diagram
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    const diagram = db.findOne('er_diagrams', d => d.id === req.params.id);
-    if (!diagram) return res.status(404).json({ error: 'Diagram not found' });
+    const { data: diagram, error } = await supabase
+      .from('er_diagrams')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
+
+    if (error || !diagram) return res.status(404).json({ error: 'Diagram not found' });
     
     // Check ownership
     if (diagram.user_id !== req.user.id) {
@@ -41,21 +51,33 @@ router.post('/', authenticate, async (req, res) => {
     
     if (id) {
       // Update
-      const updated = db.update('er_diagrams', d => d.id === id && d.user_id === req.user.id, {
-        title, nodes, edges, updated_at: new Date().toISOString()
-      });
-      if (!updated) return res.status(404).json({ error: 'Diagram not found' });
+      const { data: updated, error } = await supabase
+        .from('er_diagrams')
+        .update({
+          title, nodes, edges, 
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .eq('user_id', req.user.id)
+        .select()
+        .single();
+
+      if (error) return res.status(404).json({ error: 'Diagram not found or access denied' });
       return res.json(updated);
     } else {
       // Create
-      const newDiagram = db.insert('er_diagrams', {
-        id: uuid(),
-        user_id: req.user.id,
-        title: title || 'Untitled Diagram',
-        nodes: nodes || [],
-        edges: edges || [],
-        created_at: new Date().toISOString()
-      });
+      const { data: newDiagram, error } = await supabase
+        .from('er_diagrams')
+        .insert([{
+          user_id: req.user.id,
+          title: title || 'Untitled Diagram',
+          nodes: nodes || [],
+          edges: edges || []
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
       res.status(201).json(newDiagram);
     }
   } catch (err) {
@@ -67,7 +89,13 @@ router.post('/', authenticate, async (req, res) => {
 // Delete diagram
 router.delete('/:id', authenticate, async (req, res) => {
   try {
-    db.delete('er_diagrams', d => d.id === req.params.id && d.user_id === req.user.id);
+    const { error } = await supabase
+      .from('er_diagrams')
+      .delete()
+      .eq('id', req.params.id)
+      .eq('user_id', req.user.id);
+
+    if (error) throw error;
     res.json({ message: 'Diagram deleted successfully' });
   } catch (err) {
     console.error('Delete diagram error:', err);

@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import { v4 as uuid } from 'uuid';
-import db from '../db/schema.js';
+import { supabase } from '../utils/supabase.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 
 const router = Router();
@@ -8,12 +7,22 @@ const router = Router();
 // Get all modules
 router.get('/', authenticate, async (req, res) => {
   try {
-    const modules = db.findAll('modules');
+    const { data: modules, error } = await supabase
+      .from('modules')
+      .select(`
+        *,
+        quizzes(count),
+        materials(count)
+      `);
+
+    if (error) throw error;
+
     const enriched = modules.map(m => ({
       ...m,
-      quiz_count: db.count('quizzes', q => q.module_id === m.id),
-      material_count: db.count('materials', mat => mat.module_id === m.id)
+      quiz_count: m.quizzes?.[0]?.count || 0,
+      material_count: m.materials?.[0]?.count || 0
     }));
+
     res.json(enriched);
   } catch (err) {
     console.error('Get modules error:', err);
@@ -24,14 +33,19 @@ router.get('/', authenticate, async (req, res) => {
 // Get single module
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    const mod = db.findOne('modules', m => m.id === req.params.id);
-    if (!mod) return res.status(404).json({ error: 'Module not found' });
+    const { data: mod, error } = await supabase
+      .from('modules')
+      .select(`
+        *,
+        quizzes(*),
+        materials(*)
+      `)
+      .eq('id', req.params.id)
+      .single();
+
+    if (error || !mod) return res.status(404).json({ error: 'Module not found' });
     
-    res.json({
-      ...mod,
-      quizzes: db.findAll('quizzes', q => q.module_id === mod.id),
-      materials: db.findAll('materials', mat => mat.module_id === mod.id)
-    });
+    res.json(mod);
   } catch (err) {
     console.error('Get module error:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -46,14 +60,17 @@ router.post('/', authenticate, requireRole('teacher'), async (req, res) => {
       return res.status(400).json({ error: 'Title, description, content, category, and difficulty required' });
     }
 
-    const mod = db.insert('modules', {
-      id: uuid(),
-      title, description, content, category, difficulty,
-      icon: icon || '📚', 
-      created_by: req.user.id,
-      created_at: new Date().toISOString()
-    });
+    const { data: mod, error } = await supabase
+      .from('modules')
+      .insert([{
+        title, description, content, category, difficulty,
+        icon: icon || '📚', 
+        created_by: req.user.id
+      }])
+      .select()
+      .single();
 
+    if (error) throw error;
     res.status(201).json(mod);
   } catch (err) {
     console.error('Create module error:', err);
@@ -69,11 +86,14 @@ router.put('/:id', authenticate, requireRole('teacher'), async (req, res) => {
       if (req.body[key] !== undefined) updates[key] = req.body[key];
     }
 
-    const updated = db.update('modules', m => m.id === req.params.id, updates);
+    const { data: updated, error } = await supabase
+      .from('modules')
+      .update(updates)
+      .eq('id', req.params.id)
+      .select()
+      .single();
 
-    if (!updated) {
-      return res.status(404).json({ error: 'Module not found' });
-    }
+    if (error) return res.status(404).json({ error: 'Module not found' });
 
     res.json(updated);
   } catch (err) {
@@ -85,12 +105,12 @@ router.put('/:id', authenticate, requireRole('teacher'), async (req, res) => {
 // Delete module
 router.delete('/:id', authenticate, requireRole('teacher'), async (req, res) => {
   try {
-    const deletedCount = db.delete('modules', m => m.id === req.params.id);
+    const { error } = await supabase
+      .from('modules')
+      .delete()
+      .eq('id', req.params.id);
 
-    if (deletedCount === 0) {
-      return res.status(404).json({ error: 'Module not found' });
-    }
-
+    if (error) throw error;
     res.json({ message: 'Module deleted successfully' });
   } catch (err) {
     console.error('Delete module error:', err);

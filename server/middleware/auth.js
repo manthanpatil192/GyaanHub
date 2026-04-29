@@ -1,4 +1,4 @@
-import db from '../db/schema.js';
+import { supabase } from '../utils/supabase.js';
 
 export async function authenticate(req, res, next) {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -8,10 +8,13 @@ export async function authenticate(req, res, next) {
   }
 
   try {
-    // In our simplified local store, the token is just the user ID
-    const user = db.findOne('users', u => u.id === token);
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', token)
+      .single();
 
-    if (!user) {
+    if (error || !user) {
       return res.status(401).json({ error: 'Invalid token' });
     }
 

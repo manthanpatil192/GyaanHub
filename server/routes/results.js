@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import db from '../db/schema.js';
+import { supabase } from '../utils/supabase.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 
 const router = Router();
@@ -7,16 +7,23 @@ const router = Router();
 // Get student's previous results
 router.get('/my', authenticate, requireRole('student'), async (req, res) => {
   try {
-    const attempts = db.findAll('quiz_attempts', a => a.student_id === req.user.id && a.status === 'completed');
+    const { data: attempts, error } = await supabase
+      .from('quiz_attempts')
+      .select(`
+        *,
+        quizzes(title, total_points)
+      `)
+      .eq('student_id', req.user.id)
+      .eq('status', 'completed')
+      .order('completed_at', { ascending: false });
+
+    if (error) throw error;
     
-    const enrichedResults = attempts.map(a => {
-      const quiz = db.findOne('quizzes', q => q.id === a.quiz_id);
-      return {
-        ...a,
-        quiz_title: quiz?.title || 'Unknown',
-        quiz_total_points: quiz?.total_points || a.total_points
-      };
-    }).sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
+    const enrichedResults = attempts.map(a => ({
+      ...a,
+      quiz_title: a.quizzes?.title || 'Unknown',
+      quiz_total_points: a.quizzes?.total_points || a.total_points
+    }));
 
     const totalAttempts = enrichedResults.length;
     const avgScore = totalAttempts > 0 
@@ -39,26 +46,33 @@ router.get('/my', authenticate, requireRole('student'), async (req, res) => {
 // Get all results for a specific quiz (teacher only)
 router.get('/quiz/:quizId', authenticate, requireRole('teacher'), async (req, res) => {
   try {
-    const quiz = db.findOne('quizzes', q => q.id === req.params.quizId);
-    if (!quiz) return res.status(404).json({ error: 'Quiz not found' });
+    const { data: quiz, error: quizError } = await supabase
+      .from('quizzes')
+      .select('*')
+      .eq('id', req.params.quizId)
+      .single();
 
-    const attempts = db.findAll('quiz_attempts', a => a.quiz_id === req.params.quizId && a.status === 'completed');
+    if (quizError || !quiz) return res.status(404).json({ error: 'Quiz not found' });
+
+    const { data: attempts, error: attemptError } = await supabase
+      .from('quiz_attempts')
+      .select(`
+        *,
+        users!quiz_attempts_student_id_fkey(full_name, username, email)
+      `)
+      .eq('quiz_id', req.params.quizId)
+      .eq('status', 'completed')
+      .order('score', { ascending: false });
     
-    const enrichedResults = attempts.map(a => {
-      const user = db.findOne('users', u => u.id === a.student_id);
-      return {
-        ...a,
-        users: { full_name: user?.full_name || 'Unknown', username: user?.username, email: user?.email }
-      };
-    }).sort((a, b) => b.score - a.score);
+    if (attemptError) throw attemptError;
 
-    const avgScore = enrichedResults.length > 0 ? Math.round(enrichedResults.reduce((s, r) => s + r.score, 0) / enrichedResults.length) : 0;
-    const highestScore = enrichedResults.length > 0 ? Math.max(...enrichedResults.map(r => r.score)) : 0;
+    const avgScore = attempts.length > 0 ? Math.round(attempts.reduce((s, r) => s + r.score, 0) / attempts.length) : 0;
+    const highestScore = attempts.length > 0 ? Math.max(...attempts.map(r => r.score)) : 0;
 
     res.json({ 
       quiz, 
-      results: enrichedResults, 
-      stats: { totalAttempts: enrichedResults.length, avgScore, highestScore } 
+      results: attempts, 
+      stats: { totalAttempts: attempts.length, avgScore, highestScore } 
     });
   } catch (err) {
     console.error('Get quiz results error:', err);
@@ -69,13 +83,21 @@ router.get('/quiz/:quizId', authenticate, requireRole('teacher'), async (req, re
 // All students overview (teacher)
 router.get('/students', authenticate, requireRole('teacher'), async (req, res) => {
   try {
-    const students = db.findAll('users', u => u.role === 'student');
+    const { data: students, error: studentError } = await supabase
+      .from('users')
+      .select(`
+        id, full_name, username, email,
+        quiz_attempts(*)
+      `)
+      .eq('role', 'student');
+
+    if (studentError) throw studentError;
 
     const enrichedStudents = students.map(s => {
-      const attempts = db.findAll('quiz_attempts', a => a.student_id === s.id && a.status === 'completed');
+      const attempts = (s.quiz_attempts || []).filter(a => a.status === 'completed');
       const quizzesTaken = attempts.length;
-      const avgPct = quizzesTaken > 0 ? attempts.reduce((sum, a) => sum + (a.score / a.total_points * 100), 0) / quizzesTaken : 0;
-      const bestPct = quizzesTaken > 0 ? Math.max(...attempts.map(a => a.score / a.total_points * 100)) : 0;
+      const avgPct = quizzesTaken > 0 ? attempts.reduce((sum, a) => sum + (a.score / (a.total_points || 1) * 100), 0) / quizzesTaken : 0;
+      const bestPct = quizzesTaken > 0 ? Math.max(...attempts.map(a => a.score / (a.total_points || 1) * 100)) : 0;
       const lastActivity = attempts.length > 0 
         ? attempts.sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at))[0]?.completed_at 
         : null;
@@ -99,43 +121,38 @@ router.get('/students', authenticate, requireRole('teacher'), async (req, res) =
 // Detailed attempt review
 router.get('/attempt/:id', authenticate, async (req, res) => {
   try {
-    const attempt = db.findOne('quiz_attempts', a => a.id === req.params.id);
-    if (!attempt) return res.status(404).json({ error: 'Attempt not found' });
+    const { data: attempt, error: attemptError } = await supabase
+      .from('quiz_attempts')
+      .select(`
+        *,
+        quizzes(title, time_limit_minutes),
+        users!quiz_attempts_student_id_fkey(full_name),
+        answers(*, questions(*))
+      `)
+      .eq('id', req.params.id)
+      .single();
+
+    if (attemptError || !attempt) return res.status(404).json({ error: 'Attempt not found' });
 
     // Students can only see their own attempts
     if (req.user.role === 'student' && attempt.student_id !== req.user.id) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const quiz = db.findOne('quizzes', q => q.id === attempt.quiz_id);
-    const user = db.findOne('users', u => u.id === attempt.student_id);
-    
-    const detailedAnswers = db.findAll('answers', ans => ans.attempt_id === attempt.id)
-      .map(ans => {
-        const q = db.findOne('questions', que => que.id === ans.question_id);
-        return { 
-          ...ans, 
-          question_text: q?.question_text, 
-          option_a: q?.option_a, 
-          option_b: q?.option_b, 
-          option_c: q?.option_c, 
-          option_d: q?.option_d, 
-          correct_option: q?.correct_option, 
-          explanation: q?.explanation, 
-          points: q?.points, 
-          sort_order: q?.sort_order 
-        };
-      }).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    const detailedAnswers = attempt.answers.map(ans => ({
+      ...ans,
+      ...ans.questions
+    })).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
     res.json({
       attempt: { 
         ...attempt, 
-        quiz_title: quiz?.title, 
-        time_limit_minutes: quiz?.time_limit_minutes, 
-        student_name: user?.full_name 
+        quiz_title: attempt.quizzes?.title, 
+        time_limit_minutes: attempt.quizzes?.time_limit_minutes, 
+        student_name: attempt.users?.full_name 
       },
       answers: detailedAnswers,
-      percentage: Math.round((attempt.score / attempt.total_points) * 100)
+      percentage: Math.round((attempt.score / (attempt.total_points || 1)) * 100)
     });
   } catch (err) {
     console.error('Get attempt error:', err);
